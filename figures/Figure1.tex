@@ -1,0 +1,489 @@
+\begin{tikzpicture}
+
+	%%% scheme of the assay
+	%% enhancer diagrams
+	\coordinate (enhancers) at (0, 0);
+	
+	\setlength{\templength}{2cm/250}
+	
+	% AB80
+	\coordinate[shift = {(.4, -1.25)}] (AB80) at (enhancers);
+	
+	\draw[very thick] (AB80) -- ++(3.25cm, 0) coordinate (TSS) -- ++(.5cm, 0) node[anchor = west, fill = black, text = white, node font = \figsmall\bfseries, minimum width = 1.33cm, outer sep = 0pt] (gene) {\enhancer{AB80}};
+
+	\fill[black] (gene.north east) -- ++(.075, 0) coordinate (gene end) -- ($(gene.north east)!.4!(gene.south east)$) -- ($(gene.north east -| gene end)!.6!(gene.south east -| gene end)$) -- (gene.south east) -- cycle;
+	
+	\draw[thick, -{Stealth[round]}] (TSS) ++(0, -.2) node[anchor = north, node font = \figtiny] {$+1$} |- ++(.4,.5);
+	
+	\node[anchor = east, fill = AB80, signal, node font = \figsmall\bfseries, minimum width = 247\templength, outer sep = 0pt, xshift = -101\templength] (FL) at (TSS) {FL};
+	
+	\draw[thick] (FL.west) ++(0, .2) coordinate (c1) -- ++(0, -.4) node[anchor = north, node font = \figtiny] (p1) {$-347$}
+		(FL.west) ++(170\templength, .2) coordinate (c2) -- ++(0, -.4) node[anchor = north, node font = \figtiny] {$-179$}
+		(FL.east) ++(-170\templength, .2) coordinate (c3) -- ++(0, -.4) node[anchor = north, node font = \figtiny] {$-269$}
+		(FL.east) ++(0, .2) coordinate (c4) -- ++(0, -.4) node[anchor = north, node font = \figtiny] (p2) {$-101$};
+		
+	\draw[|<->|] (p1.south) ++(0, -.1) -- ($(p2.south) + (0, -.1)$) node[pos = .5, fill = white, text depth = 0pt, node font = \figsmaller] (size) {247 bp};
+	
+	\node[anchor = east, fill = AB80!75, signal, node font = \figsmall\bfseries, minimum width = 169\templength, outer sep = 0pt, shift = {(0, 1)}] (part A) at (FL) {\segment{A}};
+	\node[below = 0pt of part A, node font = \figsmaller] {169 bp};
+	
+	\node[anchor = west, fill = AB80!75, signal, node font = \figsmall\bfseries, minimum width = 169\templength, outer sep = 0pt, shift = {(.2, 1)}] (part B) at (FL) {\segment{B}};
+	\node[below = 0pt of part B, node font = \figsmaller] {169 bp};
+	
+	\draw[thin, gray] (c1) -- (part A.south west) (c2) -- (part A.east) (c3) -- (part B.south west) (c4) -- (part B.east);
+	
+	\coordinate[shift = {(.4, .6)}] (pea) at (gene.north west);
+	\pea{pea}
+
+
+	% Cab-1
+	\coordinate[yshift = -1.25cm -.5\columnsep] (Cab-1) at (AB80 |- size.south);
+	
+	\draw[very thick] (Cab-1) -- ++(3.25cm, 0) coordinate (TSS) -- ++(.5cm, 0) node[anchor = west, fill = black, text = white, node font = \figsmall\bfseries, minimum width = 1.33cm, outer sep = 0pt] (gene) {\enhancer{Cab-1}};
+
+	\fill[black] (gene.north east) -- ++(.075, 0) coordinate (gene end) -- ($(gene.north east)!.4!(gene.south east)$) -- ($(gene.north east -| gene end)!.6!(gene.south east -| gene end)$) -- (gene.south east) -- cycle;
+	
+	\draw[thick, -{Stealth[round]}] (TSS) ++(0, -.2) node[anchor = north, node font = \figtiny] {$+1$} |- ++(.4,.5);
+	
+	\node[anchor = east, fill = Cab-1, signal, node font = \figsmall\bfseries, minimum width = 268\templength, outer sep = 0pt, xshift = -90\templength] (FL) at (TSS) {FL};
+	
+	\draw[thick] (FL.west) ++(0, .2) coordinate (c1) -- ++(0, -.4) node[anchor = north, node font = \figtiny] (p1) {$-357$}
+		(FL.west) ++(170\templength, .2) coordinate (c2) -- ++(0, -.4) node[anchor = north, node font = \figtiny] {$-189$}
+		(FL.east) ++(-170\templength, .2) coordinate (c3) -- ++(0, -.4) node[anchor = north, node font = \figtiny] {$-258$}
+		(FL.east) ++(0, .2) coordinate (c4) -- ++(0, -.4) node[anchor = north, node font = \figtiny] (p2) {$-90$};
+	
+	\draw[|<->|] (p1.south) ++(0, -.1) -- ($(p2.south) + (0, -.1)$) node[pos = .5, fill = white, text depth = 0pt, node font = \figsmaller] (size) {268 bp};
+	
+	\node[anchor = east, fill = Cab-1!75, signal, node font = \figsmall\bfseries, minimum width = 169\templength, outer sep = 0pt, shift = {(-.1, 1)}] (part A) at (FL) {\segment{A}};
+	\node[below = 0pt of part A, node font = \figsmaller] {169 bp};
+	
+	\node[anchor = west, fill = Cab-1!75, signal, node font = \figsmall\bfseries, minimum width = 169\templength, outer sep = 0pt, shift = {(.1, 1)}] (part B) at (FL) {\segment{B}};
+	\node[below = 0pt of part B, node font = \figsmaller] {169 bp};
+	
+	\draw[thin, gray] (c1) -- (part A.south west) (c2) -- (part A.east) (c3) -- (part B.south west) (c4) -- (part B.east);
+	
+	\coordinate[shift = {(.4, .6)}] (wheat) at (gene.north west);
+	\wheat{wheat}
+
+
+	% rbcS-E9
+	\coordinate[yshift = -1.25cm -.5\columnsep] (rbcS-E9) at (AB80 |- size.south);
+	
+	\draw[very thick] (rbcS-E9) -- ++(3.25cm, 0) coordinate (TSS) -- ++(.5cm, 0) node[anchor = west, fill = black, text = white, node font = \figsmall\bfseries, minimum width = 1.33cm, outer sep = 0pt] (gene) {\enhancer{rbcS-E9}};
+
+	\fill[black] (gene.north east) -- ++(.075, 0) coordinate (gene end) -- ($(gene.north east)!.4!(gene.south east)$) -- ($(gene.north east -| gene end)!.6!(gene.south east -| gene end)$) -- (gene.south east) -- cycle;
+	
+	\draw[thick, -{Stealth[round]}] (TSS) ++(0, -.2) node[anchor = north, node font = \figtiny] {$+1$} |- ++(.4,.5);
+	
+	\node[anchor = east, fill = rbcS-E9, signal, node font = \figsmall\bfseries, minimum width = 234\templength, outer sep = 0pt, xshift = -83\templength] (FL) at (TSS) {FL};
+	
+	\draw[thick] (FL.west) ++(0, .2) coordinate (c1) -- ++(0, -.4) node[anchor = north, node font = \figtiny] (p1) {$-316$}
+		(FL.west) ++(170\templength, .2) coordinate (c2) -- ++(0, -.4) node[anchor = north, node font = \figtiny] {$-148$}
+		(FL.east) ++(-170\templength, .2) coordinate (c3) -- ++(0, -.4) node[anchor = north, node font = \figtiny] {$-251$}
+		(FL.east) ++(0, .2) coordinate (c4) -- ++(0, -.4) node[anchor = north, node font = \figtiny] (p2) {$-83$};
+	
+	\draw[|<->|] (p1.south) ++(0, -.1) -- ($(p2.south) + (0, -.1)$) node[pos = .5, fill = white, text depth = 0pt, node font = \figsmaller] (size) {234 bp};
+	
+	\node[anchor = east, fill = rbcS-E9!75, signal, node font = \figsmall\bfseries, minimum width = 169\templength, outer sep = 0pt, shift = {(-.1, 1)}] (part A) at (FL) {\segment{A}};
+	\node[below = 0pt of part A, node font = \figsmaller] {169 bp};
+	
+	\node[anchor = west, fill = rbcS-E9!75, signal, node font = \figsmall\bfseries, minimum width = 169\templength, outer sep = 0pt, shift = {(.1, 1)}] (part B) at (FL) {\segment{B}};
+	\node[below = 0pt of part B, node font = \figsmaller] {169 bp};
+	
+	\draw[thin, gray] (c1) -- (part A.south west) (c2) -- (part A.east) (c3) -- (part B.south west) (c4) -- (part B.east);
+	
+	\coordinate[shift = {(.4, .6)}] (pea 2) at (gene.north west);
+	\pea{pea 2}
+	
+	
+	%% Plant STARR-seq constructs
+	\draw[decorate, decoration = {brace, amplitude = .33cm, raise= .33cm}] ($(pea -| gene end) + (0, .5)$) -- (size -| gene end) coordinate[pos = .5, xshift = .66cm] (curly);
+	
+	\draw[ultra thick, -Latex] (curly) ++(-.75\pgflinewidth, 0) -- ++(1, 0) coordinate[xshift = .5\columnsep] (constructs);
+	
+	\coordinate[yshift = 1.75cm] (construct 1) at (constructs);
+	\coordinate[yshift = 1.05cm] (construct 2) at (constructs);
+	\coordinate[yshift = .35cm] (construct 3) at (constructs);
+	\coordinate[yshift = -.35cm] (construct 4) at (constructs);
+	\coordinate[yshift = -1.05cm] (construct 5) at (constructs);
+	\coordinate[yshift = -1.75cm] (construct 6) at (constructs);
+	
+	\PSconstruct{construct 1}{AB80}
+	
+	\draw[Latex-] (c3) ++(-.2, .15) -- ++(0, .4) node[anchor = south, text depth = 0pt] {35S minimal promoter};
+	\coordinate (constructs end) at (construct end);
+	
+	\PSconstruct*[MediumPurple1]{construct 2}{AB80}
+	\PSconstruct[HotPink1]{construct 3}{Cab-1}
+	\PSconstruct*[MediumOrchid3]{construct 4}{Cab-1}
+	\PSconstruct[Plum1]{construct 5}{rbcS-E9}
+	\PSconstruct*[SlateBlue3]{construct 6}{rbcS-E9}
+
+	\draw[Latex-] (c2) ++(-.3, -.175) -- ++(0, -.4) node[anchor = north, text depth = 0pt] (enh) {enhancer};
+	\node[anchor = base, text depth = 0pt, xshift = .1cm] (bc) at (ORF.west |- enh.base) {barcode};
+	\draw[Latex-] (ORF.south west) ++(.1, -.05) -- (bc.north);
+	
+	
+	%% infiltration
+	\draw[decorate, decoration = {brace, amplitude = .33cm, raise= .33cm}] ($(construct 1 -| constructs end) + (0, .33)$) -- ($(construct 6 -| constructs end) +(0, -.33)$) coordinate[pos = .5, xshift = .66cm] (curly 2);
+	
+	% light
+	\fill[light] (curly 2 -| \textwidth, 0) ++(-2.2, 2.4) coordinate (light bar bottom left) rectangle ++(2.2, \columnsep) coordinate (light bar top right);
+	
+	\distance{light bar bottom left}{light bar top right}
+	
+	\fill[dark] (light bar bottom left) ++(16/48*\xdistance, 0) coordinate (dark bl) rectangle ++(8/48*\xdistance, \ydistance) coordinate (dark tr) ++(16/48*\xdistance, -\ydistance) coordinate (dark 2 bl) rectangle ++(8/48*\xdistance, \ydistance);
+	
+	\path[node font = \figsmall] ($(light bar bottom left |- light bar top right)!.5!(dark bl)$) node {16h}
+		($(dark bl)!.5!(dark tr)$) node[text = white] {8h}
+		($(dark tr)!.5!(dark 2 bl)$) node {16h}
+		($(dark 2 bl)!.5!(light bar top right)$) node[text = white, inner xsep = 0pt] {8h};
+		
+	\node[anchor = south east, node font = \bfseries, minimum width = \xdistance, text depth = 0pt] (light) at (light bar top right) {\light};
+	
+	\coordinate[yshift = -2.2cm] (light bottom) at (light bar bottom left);
+	\fill[light, fill opacity = .2] (light bar bottom left) rectangle (light bottom -| dark bl)
+		(light bar bottom left -| dark tr) rectangle (light bottom -| dark 2 bl);
+	\fill[dark, fill opacity = .2] (dark bl) rectangle (light bottom -| dark tr)
+		(dark 2 bl) rectangle (light bottom -| light bar top right);
+	
+	\coordinate[shift = {(1.1, -1.1)}] (leaf 1) at (light bar bottom left);
+	\leaf[.5]{leaf 1}
+	
+	% dark
+	\fill[dark] (curly 2 -| light bar bottom left) ++(0, -2.4) coordinate (dark bar top left) rectangle ++(2.2, -\columnsep) coordinate (dark bar bottom right);
+	
+	\path[node font = \figsmall] ($(dark bar top left)!.5!(dark bar bottom right)$) node[text = white] {48h};
+		
+	\node[anchor = north east, node font = \bfseries, minimum width = \xdistance] at (dark bar bottom right) {\dark};
+	
+	\coordinate[yshift = 2.2cm] (dark top) at (dark bar top left);
+	\fill[dark, fill opacity = .2] (dark bar top left) rectangle (dark top -| dark bar bottom right);
+	
+	\coordinate[shift = {(1.1, 1.1)}] (leaf 2) at (dark bar top left);
+	\leaf[.5]{leaf 2}
+	
+	% arrows
+	\draw[ultra thick, -Latex] (curly 2) ++(-.75\pgflinewidth, 0) to[out = 0, in = 180] ($(leaf 1) + (-1.2, 0)$);
+	\draw[ultra thick, -Latex] (curly 2) ++(-.75\pgflinewidth, 0) to[out = 0, in = 180] ($(leaf 2) + (-1.2, 0)$);
+
+	
+	%%% plant enhancer strength in light/dark
+	\coordinate[yshift = -\columnsep] (light/dark) at (enhancers |- size.south);
+
+	\def\shadeplot{%
+		\fill[light, fill opacity = .1] (\xmin, \ymin) rectangle (1, \ymax) (1.5, \ymin) rectangle (2, \ymax) (2.5, \ymin) rectangle (3, \ymax);
+		\fill[dark, fill opacity = .1] (1, \ymin) rectangle (1.5, \ymax) (2, \ymin) rectangle (2.5, \ymax) (3, \ymin) rectangle (\xmax, \ymax);
+		\draw (1.5, \ymin) -- (1.5, \ymax) (2.5, \ymin) -- (2.5, \ymax);
+	}
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(light/dark)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEfl_strength_fwd_axes.tsv},
+		enlarge y limits = {value = .125, lower},
+		ytick = {-2, 0, ..., 10},
+		group/every plot/.append style = {x grids = false},
+		zero line,
+		ylabel = $\log_2$(enhancer strength),
+		ylabel style = {xshift = .5em}
+	]{\twothirdcolumnwidth}{4}{enhancer segment}
+		
+		\nextgroupplot[
+			title = \enhancer{35S},
+			width = 4.8/10.8*\plotwidth,
+			title style = {minimum width = 4.8/10.8*\plotwidth},
+			title color = 35S,
+			x tick table half segment = {rawData/PEfl_strength_fwd_35S_boxplot.tsv}{part},
+			execute at begin axis/.append = {
+				\fill[light, fill opacity = .1] (\xmin, \ymin) rectangle (1, \ymax);
+				\fill[black, fill opacity = .1] (1, \ymin) rectangle (\xmax, \ymax);
+			}
+		]
+		
+			% boxplots
+			\halfboxplots[]{%
+				box color = 35S,
+				fill opacity = .5
+			}{rawData/PEfl_strength_fwd_35S}
+			
+			% add sample size
+			\samplesizehalf[nodes near coords style = {name = samplesize}]{rawData/PEfl_strength_fwd_35S_boxplot.tsv}{id}{n}
+			
+			% save coordinates
+			\coordinate (35S) at (1, 0);
+			\coordinate (35S dist) at (1.225, 0);
+		
+		
+		\nextgroupplot[
+			title = \enhancer{AB80},
+			width = 12.8/10.8*\plotwidth,
+			title style = {minimum width = 12.8/10.8*\plotwidth},
+			title color = AB80,
+			x tick table half segment = {rawData/PEfl_strength_fwd_AB80_boxplot.tsv}{part},
+			execute at begin axis/.append = {\shadeplot}
+		]
+		
+			% boxplots
+			\halfboxplots[]{%
+				box color = AB80,
+				fill opacity = .5
+			}{rawData/PEfl_strength_fwd_AB80}
+			
+			% add sample size
+			\samplesizehalf{rawData/PEfl_strength_fwd_AB80_boxplot.tsv}{id}{n}
+			
+			% save coordinates
+			\pgfplotsinvokeforeach{1, ..., 3}{		
+				\coordinate (AB80_#1) at (#1, 0);
+			}
+		
+		
+		\nextgroupplot[
+			title = \enhancer{Cab-1},
+			width = 12.8/10.8*\plotwidth,
+			title style = {minimum width = 12.8/10.8*\plotwidth},
+			title color = Cab-1,
+			x tick table half segment = {rawData/PEfl_strength_fwd_Cab-1_boxplot.tsv}{part},
+			execute at begin axis/.append = {\shadeplot}
+		]
+		
+			% boxplots
+			\halfboxplots[]{%
+				box color = Cab-1,
+				fill opacity = .5
+			}{rawData/PEfl_strength_fwd_Cab-1}
+			
+			% add sample size
+			\samplesizehalf{rawData/PEfl_strength_fwd_Cab-1_boxplot.tsv}{id}{n}
+			
+			% save coordinates
+			\pgfplotsinvokeforeach{1, ..., 3}{		
+				\coordinate (Cab-1_#1) at (#1, 0);
+			}
+		
+		
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9},
+			width = 12.8/10.8*\plotwidth,
+			title style = {minimum width = 12.8/10.8*\plotwidth},
+			title color = rbcS-E9,
+			x tick table half segment = {rawData/PEfl_strength_fwd_rbcS-E9_boxplot.tsv}{part},
+			execute at begin axis/.append = {\shadeplot}
+		]
+		
+			% boxplots
+			\halfboxplots[]{%
+				box color = rbcS-E9,
+				fill opacity = .5
+			}{rawData/PEfl_strength_fwd_rbcS-E9}
+			
+			% add sample size
+			\samplesizehalf{rawData/PEfl_strength_fwd_rbcS-E9_boxplot.tsv}{id}{n}
+			
+			% save coordinates
+			\pgfplotsinvokeforeach{1, ..., 3}{		
+				\coordinate (rbcS-E9_#1) at (#1, 0);
+			}
+			
+	\end{hgroupplot}
+	
+	% light labels
+	\distance{35S}{35S dist}
+	
+	\node[anchor = south, font = \bfseries\vphantom{A}, xshift = -\xdistance, text depth = 0pt] (lplus) at (group c1r1.south -| 35S) {+};
+	\node[anchor = south, font = \bfseries\vphantom{A}, xshift = \xdistance, text depth = 0pt] at (group c1r1.south -| 35S) {\textminus};		
+	
+	\foreach \enh in {AB80, Cab-1, rbcS-E9}{
+		\foreach \x in {1, ..., 3}{
+			\node[anchor = south, font = \bfseries\vphantom{A}, xshift = -\xdistance, text depth = 0pt] at (group c1r1.south -| \enh_\x) {+};
+			\node[anchor = south, font = \bfseries\vphantom{A}, xshift = \xdistance, text depth = 0pt] at (group c1r1.south -| \enh_\x) {\textminus};		
+		}
+	}
+	
+	\node[anchor = base east, node font = \figsmall, text depth = 0pt] at (group c1r1.west |- lplus.base) {light};
+	
+	\foreach \x in {1, ..., 4}{
+		\draw[dashed] (group c\x r1.west |- samplesize.south) -- (group c\x r1.east |- samplesize.south);
+	}
+	
+	%%% light-responsiveness
+	\coordinate (light-resp) at (light/dark -| \textwidth - \threecolumnwidth, 0);
+	
+	\node[anchor = north west, node font = \figsmall] (penh) at (light-resp) {\phantom{enhancer}};
+	
+	\distance{penh.north east}{\textwidth, 0}
+	
+	\begin{axis}[%
+		anchor = above north west,
+		at = {(penh.north east)},
+		width = \xdistance,
+		axis limits from table = {rawData/PEfl_lightResp_fwd_axes.tsv},
+		ytick = {-10, -8, ..., 10},
+		x tick table segment = {rawData/PEfl_LightResp_fwd_boxplot.tsv}{part},
+		xticklabel style = {name = xticklabel},
+		x grids = false,
+		zero line,
+		title = light-responsiveness,
+		title style= {minimum width = \xdistance, left color = light!20, right color = dark!20},
+		ylabel = $\log_2$(light-responsiveness)
+	]
+	
+			% boxplots
+			\boxplots[]{%
+				box colors from table = {rawData/PEfl_lightResp_fwd_boxplot.tsv}{enhancer},
+				fill opacity = .5
+			}{rawData/PEfl_lightResp_fwd}
+			
+			% add sample size
+			\samplesize{rawData/PEfl_LightResp_fwd_boxplot.tsv}{id}{n}
+			
+			% save coordinates
+			\coordinate (c1) at (1, 0);
+			\coordinate (c2) at (2, 0);
+	
+	\end{axis}
+	
+	\node[anchor = base east, node font = \figsmall] (lpart) at (last plot.west |- xticklabel.base) {segment};
+	\node[anchor = north east, node font = \figsmall] (lenh) at (lpart.south east) {enhancer};
+	
+	\distance{c1}{c2}
+	
+	\foreach \x/\len in {0/1, 1/3, 4/3, 7/3}{
+		\draw[serif cm-serif cm, shorten both = .1\xdistance] (xticklabel.south -| c1) ++(\xdistance * \x  - .5\xdistance, 0) -- ++(\len * \xdistance, 0) coordinate[pos = .5] (mid); 
+		\node[anchor = base, node font = \figsmall] at (mid |- lenh.base) {\pgfplotstablegetelem{\x}{enhancer}\of{rawData/PEfl_lightResp_fwd_boxplot.tsv}\enhancer{\pgfplotsretval}};
+	}
+	
+	
+	%%% dual-luciferase construct
+	\coordinate[yshift = -\columnsep] (DL construct) at (enhancers |- xlabel.south);
+	
+	\coordinate[shift = {(\columnsep, -1)}] (construct) at (DL construct);
+	
+	\draw[dashed, thick] (construct) -- ++(.5, 0) coordinate (c1);
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (Luc) at ($(c1) + (.1, 0)$) {Luc};
+	
+	\draw[line width = .2cm, DarkOliveGreen3] (Luc.east) ++(.4, 0) coordinate (c2) -- ++(.5, 0) coordinate[pos = .5] (pro1) coordinate (c3);
+	\draw[-{Stealth[round]}, thick] (c2) ++(-.5\pgflinewidth, 0) |- ++(-.4, .3);
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (BlpR) at ($(c3) + (.3, 0)$) {BlpR};
+	
+	\draw[line width = .2cm, PaleGreen3] (BlpR.east) ++(.4, 0) coordinate (c4) -- ++(.5, 0) coordinate (c5);
+	\draw[-{Stealth[round]}, thick] (c4) ++(-.5\pgflinewidth, 0) |- ++(-.4, .3);
+	
+	\draw[line width = .25cm, -Triangle Cap, AB80!75]  (c5) ++(.4, 0) -- ++(.6, 0) coordinate[pos = .5] (enh) coordinate (c6);
+	
+	\draw[line width = .2cm, 35S promoter] (c6) ++(.1, 0) -- ++(.3, 0) coordinate[pos = .5] (pro2) coordinate (c7);
+	\draw[-{Stealth[round]}, thick] (c7) ++(.5\pgflinewidth, 0) |- ++(.4, .3);
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (NLuc) at ($(c7) + (.4, 0)$) {NanoLuc};
+	
+	\draw[dashed, thick] (NLuc.east) ++(.1, 0) coordinate (c8) -- ++(.5, 0) coordinate (construct end);
+	
+	\begin{pgfonlayer} {background}
+		\draw[thick] (c1) -- (Luc.west) (Luc.east) -- (BlpR.west) (BlpR.east) -- (NLuc.west) (NLuc.east) -- (c8);
+	\end{pgfonlayer}
+	
+	\draw[Latex-] (enh) ++(0, .175) -- ++(0, .4) node[anchor = south, text depth = 0pt] {enhancer};
+	\draw[Latex-] (pro1) ++(0, -.15) -- ++(0, -.4) node[anchor = north, text depth = 0pt] {\textit{AtUBQ10} promoter};
+	\draw[Latex-] (pro2) ++(0, -.15) -- ++(0, -.4) node[anchor = north, text depth = 0pt] (l35Spr) {35S minimal promoter};
+
+	\draw[decorate, decoration = {brace, amplitude = .4cm, aspect = .825}] (l35Spr.south -| construct end) -- (l35Spr.south -| construct) coordinate[pos = .825, yshift = -.4cm] (curly);
+	
+	\draw[ultra thick, -Latex] (curly) ++(0, .75\pgflinewidth) -- ++(0, -.3) arc[start angle = 180, end angle = 270, radius = .8cm] -- ++(.3, 0) coordinate[shift = {(1, .1)}] (Arabidopsis);
+	\arabidopsis[.9]{Arabidopsis};
+	\node [anchor = north east, align = center, inner xsep = 0pt, xshift = .1cm] at (curly) {integrate\\into\\\textit{Arabidopsis}\\genome};
+	
+	\draw[ultra thick, -Latex] (Arabidopsis) ++(1, -.1) -- ++(.8, 0) node[anchor = west, align = center] {measure\\luciferase (Luc)\\and nanoluciferase\\(NanoLuc) activity};
+		
+	
+	%%% dual-luciferase plot
+	\coordinate (DL plot) at (DL construct -| \textwidth - \twocolumnwidth, 0);
+	
+	\begin{axis}[%
+		anchor = north west,
+		at = {(DL plot)},
+		width = \fourcolumnwidth - \plotylabelwidth,
+		xshift = \plotylabelwidth,
+		x grids = false,
+		axis limits from table = {rawData/DL_enhancers_axes.tsv},
+		zero line,
+		ylabel = $\log_2$(NanoLuc/Luc),
+		x tick table enhancer = {rawData/DL_enhancers_boxplot.tsv}{sample},
+		xticklabel style = {rotate = 45, anchor = north east}
+	]
+
+		% boxplots
+		\boxplots{%
+			box colors from table = {rawData/DL_enhancers_boxplot.tsv}{sample},
+			fill opacity = .5
+		}{rawData/DL_enhancers}
+		
+		% add sample size
+		\samplesize[nodes near coords style = {name = samplesize}]{rawData/DL_enhancers_boxplot.tsv}{id}{n}
+
+	\end{axis}
+	
+	
+	%%% correlation between Plant STARR-seq and dual-luciferase assay
+	\coordinate (DL cor) at (DL construct -| \textwidth - \fourcolumnwidth, 0);
+	
+	\begin{axis}[
+		anchor = north west,
+		at = {(DL cor)},
+		width = \fourcolumnwidth - \plotylabelwidth,
+		xshift = \plotylabelwidth,
+		axis limits from table = {rawData/DL_enhancers_cor_axes.tsv},
+		enlargelimits = .1,
+		xlabel = {\vphantom{$\log_2$(enhancer strength)}},
+		xlabel style = {name = xlabel},
+		ylabel = {$\log_2$(NanoLuc/Luc)},
+		scatter/classes = {
+			none={black},
+			35S={35S enhancer},
+			AB80={AB80},
+			Cab-1={Cab-1},
+			rbcS-E9={rbcS-E9}
+		},
+		legend style = {anchor = south east, at = {(1, 0)}},
+		legend image post style = {fill opacity = 1, mark size = 1.25},
+		legend plot pos = right,
+		legend cell align = right,
+	]
+	
+		% regression line
+		\addplot [draw = none, forget plot] table [x = enrichment, y = {create col/linear regression = { y = l2ratio}}] {rawData/DL_enhancers_cor_points.tsv};
+		
+		\draw[gray, dashed] (\xmin, \xmin * \pgfplotstableregressiona + \pgfplotstableregressionb) -- (\xmax, \xmax * \pgfplotstableregressiona + \pgfplotstableregressionb);
+	
+		% scatter plot
+		\addplot [
+			scatter,
+			scatter src = explicit symbolic,
+			only marks,
+			mark = solido,
+			mark size = 2,
+			error bars/y dir = both,
+			error bars/y explicit,
+		] table[x = enrichment, y = l2ratio, meta = enhancer, y error = CI] {rawData/DL_enhancers_cor_points.tsv};
+		
+		% correlation
+		\stats{rawData/DL_enhancers_cor}
+		
+		% legend
+		\legend{\enhancer{none}, \enhancer{35S}, \enhancer{AB80}, \enhancer{Cab-1}, \enhancer{rbcS-E9}}
+	
+	\end{axis}
+	
+	\node[anchor = north east, inner xsep = 0pt] at (\textwidth, 0 |- xlabel.north) {$\log_2$(enhancer strength)};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{enhancers |- light.north}
+	\subfiglabel{light/dark}
+	\subfiglabel{light-resp}
+	\subfiglabel{DL construct}
+	\subfiglabel{DL plot}
+	\subfiglabel{DL cor}
+	
+\end{tikzpicture}

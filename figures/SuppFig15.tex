@@ -1,0 +1,51 @@
+\begin{tikzpicture}
+
+	%%% predict light-responsiveness from single fragments
+	\coordinate (predict resp) at (0, 0);
+	
+	\begin{axis}[%
+		anchor = above north west,
+		at = {(0, 0)},
+		xshift = \plotylabelwidth + \baselineskip,
+		width = \fourcolumnwidth,
+		axis limits from table = {rawData/PEF_cor_prediction_lightResp_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+		colormap name = viridis,
+		xlabel = {\textbf{prediction}:\\$\log_2$(\lightResp)},
+		ylabel = {\textbf{measurement}:\\$\log_2$(\lightResp)},
+		xlabel style = {inner xsep = 0pt, xshift = -3pt},
+		title = {\lightResp},
+		title style = {left color = light!20, right color = dark!20, minimum width = \fourcolumnwidth},
+		colorbar style = {
+	 		name = colorbar,
+			anchor = north west,
+			at = {(.025, .975)},
+			width = .25cm,
+			height = .4 * \pgfkeysvalueof{/pgfplots/parent axis height},
+			ytick pos = right,
+			yticklabel pos = right,
+			yticklabel style = {node font = \figtiny, inner xsep = .1em},
+			ytick = {0, 2, ..., 15},
+			yticklabel = \pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult},
+			ylabel = count,
+			ylabel style = {node font = \figsmall, inner ysep = 0pt}
+		},
+		name = blub,
+		colorbar
+	]
+
+		% hexbin plot
+		\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEF_cor_prediction_lightResp_hexbin.tsv};
+		
+		% correlation
+		\stats[stats position = south east]{rawData/PEF_cor_prediction_lightResp};
+		
+	\end{axis}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{predict resp}
+	
+\end{tikzpicture}

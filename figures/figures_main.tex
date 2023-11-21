@@ -1,0 +1,537 @@
+% !TeX spellcheck = en_US
+\documentclass[10pt]{article}
+
+\usepackage{geometry}
+\usepackage[no-math]{fontspec}
+\usepackage{mathfont}
+\usepackage{amsmath}
+\usepackage[autostyle]{csquotes}
+\usepackage{graphicx}
+\usepackage[x11names, table]{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{xifthen}
+\usepackage{caption}
+\usepackage{newfloat}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xstring}
+\usepackage{polyglossia}
+\setdefaultlanguage[variant = american]{english}
+\usepackage[noabbrev]{cleveref}
+
+%%% font definitions
+\defaultfontfeatures{Ligatures = TeX}
+\setsansfont{Arial}
+\renewcommand{\familydefault}{\sfdefault}
+\mathfont{Arial}
+\newfontfamily{\signiffont}{Arial Unicode MS}
+\newfontfamily{\symbolfont}{Symbol}
+
+%%% font sizes
+\newcommand{\fignormal}{\footnotesize}
+\newcommand{\figsmall}{\scriptsize}
+\newcommand{\figsmaller}{\fontsize{6}{7}\selectfont}
+\newcommand{\figtiny}{\tiny}
+\newcommand{\figlarge}{\small}
+\newcommand{\fighuge}{\normalsize}
+
+%%% page layout
+\geometry{letterpaper, textwidth = 174mm, textheight = 237.5mm, marginratio = 1:1}
+\renewcommand{\textfraction}{0}
+\makeatletter
+	\setlength{\@fptop}{0pt}
+\makeatother
+    
+%%% header and footer
+\pagestyle{empty}
+
+% define page style for supplemental data (normal font & no page number)
+% set header text with `\markboth{<left head>}{<right head>}` or `\markright{<head>}`
+\makeatletter
+	\def\ps@SuppData{%
+		\let\@oddfoot\@empty\let\@evenfoot\@empty
+		\def\@evenhead{\hfil\leftmark}%
+		\def\@oddhead{\rightmark\hfil}%
+		\let\@mkboth\@gobbletwo
+		\let\sectionmark\@gobble
+		\let\subsectionmark\@gobble
+	}
+\makeatother
+
+
+%%% no indentation
+\setlength\parindent{0pt}
+
+%%% useful lengths
+\setlength{\columnsep}{4mm}
+\newlength{\onecolumnwidth}
+\setlength{\onecolumnwidth}{\textwidth}
+\newlength{\twocolumnwidth}
+\setlength{\twocolumnwidth}{0.5\onecolumnwidth}
+\addtolength{\twocolumnwidth}{-.5\columnsep}
+\newlength{\threecolumnwidth}
+\setlength{\threecolumnwidth}{.333\onecolumnwidth}
+\addtolength{\threecolumnwidth}{-.666\columnsep}
+\newlength{\twothirdcolumnwidth}
+\setlength{\twothirdcolumnwidth}{2\threecolumnwidth}
+\addtolength{\twothirdcolumnwidth}{\columnsep}
+\newlength{\fourcolumnwidth}
+\setlength{\fourcolumnwidth}{.25\onecolumnwidth}
+\addtolength{\fourcolumnwidth}{-.75\columnsep}
+\newlength{\threequartercolumnwidth}
+\setlength{\threequartercolumnwidth}{3\fourcolumnwidth}
+\addtolength{\threequartercolumnwidth}{2\columnsep}
+
+\newlength{\templength}
+\newlength{\basewidth}
+
+\newlength{\xdistance}
+\newlength{\ydistance}
+
+%%% useful commands
+\renewcommand{\textprime}{\char"2032{}}
+\newcommand{\textalpha}{\char"03B1{}}
+\renewcommand{\textbeta}{\char"03B2{}}
+\newcommand{\textDelta}{\char"0394{}}
+\newcommand{\textlambda}{\char"03BB{}}
+\renewcommand{\textle}{\char"2264{}}
+\renewcommand{\textge}{\char"2265{}}
+
+
+\newcommand{\light}{light}
+\newcommand{\dark}{dark}
+\newcommand{\lightResp}{light-responsiveness}
+
+\newrobustcmd{\enhancer}[1]{%
+	\IfStrEqCase{#1}{%
+		{none}{none}%
+		{35S}{35S}%
+		{AB80}{\textit{AB80}}%
+		{Cab-1}{\textit{Cab\nobreakdash-1}}%
+		{rbcS-E9}{\textit{rbcS\nobreakdash-E9}}% removing this percentage sign causes an error
+	}[\textcolor{Firebrick1}{\bfseries unknown enhancer}]%
+}
+\newrobustcmd{\segment}[1]{%
+	\IfStrEqCase{#1}{%
+		{FL}{FL}%
+		{A}{5\textprime{}}%
+		{B}{3\textprime{}}% removing this percentage sign causes an error
+	}[\textcolor{Firebrick1}{\bfseries unknown segment}]%
+}
+\newrobustcmd{\timepoint}[1]{%
+	\pgfmathint{#1 + 8}%
+	ZT \pgfmathresult%
+}
+
+
+\makeatletter
+	\newcommand{\distance}[2]{
+		\path (#1);
+		\pgfgetlastxy{\xa}{\ya} 
+		\path (#2);
+		\pgfgetlastxy{\xb}{\yb}   
+		\pgfpointdiff{\pgfpoint{\xa}{\ya}}{\pgfpoint{\xb}{\yb}}%
+		\setlength{\xdistance}{\pgf@x}
+		\setlength{\ydistance}{\pgf@y}
+	}
+	
+	\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1\relax\,#1}
+\makeatother
+
+%%% tikz setup
+\pgfmathsetseed{928}
+
+\input{tikz_config}
+\input{pgfplots_config}
+
+%%% table layout
+\renewcommand{\arraystretch}{1.33}
+
+\setlength{\aboverulesep}{0pt}
+\setlength{\belowrulesep}{0pt}
+
+\newcounter{tblerows}
+\expandafter\let\csname c@tblerows\endcsname\rownum % to restore proper behaviour of \rowcolors in tabularx environments
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+%%% declare figure types
+\newif\ifnpc
+
+\newif\ifmain
+\newcounter{fig}
+
+\newenvironment{fig}{%
+	\begin{figure}[p]%
+		\stepcounter{fig}%
+		\pdfbookmark{\figurename\ \thefig}{figure\thefig}
+		\tikzsetnextfilename{figure\thefig}%
+		\fignormal%
+		\centering%
+}{%
+	\end{figure}%
+	\clearpage%
+	\ifnpc%
+		\makenextpagecaption%
+		\global\npcfalse%
+	\fi%
+}
+
+\newif\ifsupp
+\newcounter{sfig}
+
+\DeclareFloatingEnvironment[fileext = losf, name = Supplemental \figurename]{suppfigure}
+
+\newenvironment{sfig}{%
+	\begin{suppfigure}[p]%
+		\stepcounter{sfig}%
+		\setcounter{subfig}{0}%
+		\pdfbookmark{\suppfigurename\ S\thesfig}{supp_figure\thesfig}
+		\tikzsetnextfilename{supp_fig\thesfig}%
+		\fignormal%
+		\centering%
+}{%
+	\end{suppfigure}%
+	\clearpage%
+	\ifnpc%
+		\makenextpagecaption%
+		\global\npcfalse%
+	\fi%
+}
+
+%% command to put the caption on the next page
+% use instead of a normal caption: \nextpagecaption{<caption text>}
+\makeatletter
+	\newcommand{\nextpagecaption}[1]{%
+		\global\npctrue%
+		\xdef\@npctype{\@currenvir}%
+		\captionlistentry{#1}%
+		\long\gdef\makenextpagecaption{%
+				\csname\@npctype\endcsname%
+					\ContinuedFloat%
+					\caption{#1}%
+				\csname end\@npctype\endcsname%
+				\clearpage%
+		}%
+	}
+\makeatother
+
+
+%%% caption format
+\DeclareCaptionJustification{nohyphen}{\hyphenpenalty = 10000}
+
+\captionsetup{
+	labelsep = period,
+	justification = nohyphen,
+	singlelinecheck = false,
+	labelfont = bf,
+	font = small,
+	figureposition = below,
+	tableposition = above
+}
+\captionsetup[figure]{skip = .5\baselineskip}
+
+\newcommand{\titleend}{\\}
+\newcommand{\nextentry}{\\}
+\newcommand{\captiontitle}[2][]{\textbf{#2.}\titleend}
+
+
+%%% subfigure labels
+\newif\ifsubfigupper
+\subfiguppertrue
+
+\newcounter{subfig}[figure]
+
+\tikzset{
+	subfig label/.style = {anchor = north west, inner sep = 0pt, font = \normalsize\bfseries}
+}
+
+\newcommand{\subfiglabel}[2][]{
+	\node[anchor = north west, inner sep = 0pt, font = \large\bfseries, #1] at (#2) {\strut\stepcounter{subfig}\ifsubfigupper\Alph{subfig}\else\alph{subfig}\fi};
+}
+
+\newcommand{\subfigrefsep}{}
+\newcommand{\subfigrefand}{~and~}
+\newcommand{\subfigrefrange}{\textendash}
+
+\newcommand{\subfigunformatted}[1]{\ifsubfigupper\uppercase{#1}\else\lowercase{#1}\fi}
+\newcommand{\plainsubfigref}[1]{\textbf{\subfigunformatted{#1}}}
+\newcommand{\subfig}[1]{\textbf{(\plainsubfigref{#1})}\subfigrefsep}
+\newcommand{\subfigtwo}[2]{\textbf{(\plainsubfigref{#1}\subfigrefand\plainsubfigref{#2})}\subfigrefsep}
+\newcommand{\subfigrange}[2]{\textbf{(\plainsubfigref{#1}\subfigrefrange\plainsubfigref{#2})}\subfigrefsep}
+\newcommand{\parensubfig}[2][]{\textbf{(#1\plainsubfigref{#2})}}
+\newcommand{\parensubfigtwo}[3][]{\textbf{(#1\plainsubfigref{#2}\subfigrefand\plainsubfigref{#3})}}
+\newcommand{\parensubfigrange}[3][]{\textbf{(#1\plainsubfigref{#2}\subfigrefrange\plainsubfigref{#3})}}
+
+\newcommand{\supports}[1]{(Supports #1) }
+
+
+%%% cross-reference setup
+\newcommand{\crefrangeconjunction}{\subfigrefrange}
+\newcommand{\crefpairgroupconjunction}{\subfigrefand}
+\newcommand{\crefmiddlegroupconjunction}{, }
+\newcommand{\creflastgroupconjunction}{,\subfigrefand}
+
+\crefname{figure}{Figure}{Figures}
+\crefname{suppfigure}{Supplemental Figure}{Supplemental Figures}
+\crefname{table}{Table}{Tables}
+\crefname{supptable}{Supplemental Table}{Supplemental Tables}
+\crefname{suppdata}{Supplemental Data Set}{Supplemental Data Sets}
+
+
+%%% what to include
+\maintrue
+\supptrue
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%   ||    preamble end    ||   %%%
+%%%--\\//------------------\\//--%%%
+%%%   \/   begin document   \/   %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+	\sffamily
+	\frenchspacing
+	
+	
+	%%% Main figures start
+	\ifmain
+		
+		\begin{fig}
+			\input{Figure1}%
+			\nextpagecaption{%
+				\captiontitle{Enhancers from photosynthesis genes show light-responsive activity}%
+				\subfigtwo{A}{B} Full-length (FL) enhancers, as well as 169-bp long segments from their 5\textprime{} or 3\textprime{} end, of the \textit{Pisum sativum} \enhancer{AB80} and \enhancer{rbcS-E9} genes and the \textit{Triticum aestivum} \enhancer{Cab-1} gene were cloned upstream of the 35S minimal promoter driving the expression of a barcoded GFP reporter gene \parensubfig{A}. All constructs were pooled and the viral 35S enhancer was added as an internal control. The pooled enhancer library was subjected to Plant STARR-seq in tobacco leaves with plants grown for 2 days in normal light/dark cycles ($+$ light) or completely in the dark (\textminus{} light) prior to RNA extraction \parensubfig{B}. Enhancer strength was normalized to a control construct without an enhancer ($\log_2$ set to 0).\nextentry
+				\subfig{C} Light-responsiveness ($\log_2$[enhancer strength\textsuperscript{\light}/enhancer strength\textsuperscript{\dark}]) was determined for the indicated enhancer segments.\nextentry
+				\subfig{D} Transgenic \textit{Arabidopsis} lines were generated with T-DNAs harboring a constitutively expressed luciferase (Luc) gene and a nanoluciferase (NanoLuc) gene under control of a 35S minimal promoter coupled to the 35S enhancer or the \segment{B} segments of the \enhancer{AB80}, \enhancer{Cab-1}, or \enhancer{rbcS-E9} enhancers.\nextentry
+				\subfig{E} Nanoluciferase activity was measured in 5 T2 plants from these lines and normalized to the activity of luciferase. The NanoLuc/Luc ratio was normalized to a control construct without an enhancer (none; $\log_2$ set to 0).\nextentry
+				\subfig{F} The mean NanoLuc/Luc ratio was compared to the mean enhancer strength determined by STARR-seq. Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancers are indicated. A linear regression line is shown as a dashed line.  Error bars represent the 95\% confidence interval.\nextentry
+				Box plots in \parensubfig{B}, \parensubfig{C}, and \parensubfig{E} represent the median (center line), upper and lower quartiles (box limits), 1.5$\times$ interquartile range (whiskers), and outliers (points) for all corresponding barcodes \parensubfigtwo{B}{C} or plant lines \parensubfig{E} from two \parensubfigtwo{B}{C} or three \parensubfig{E} independent replicates. Numbers at the bottom of each box plot indicate the number of samples in each group.
+			}%
+			\label{fig:PEfl_fwd}%
+		\end{fig}
+		
+		\begin{fig}
+			\input{Figure2}%
+			\caption{%
+				\captiontitle{The \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers contain multiple mutation-sensitive regions}%
+				\subfigrange{A}{C} All possible single-nucleotide substitution, deletion, and insertion variants of the \segment{A} and \segment{B} segments of the \enhancer{AB80} \parensubfig{A}, \enhancer{Cab-1} \parensubfig{B}, and \enhancer{rbcS-E9} \parensubfig{C} enhancers were subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (\light) or completely in the dark (\dark) for two days prior to RNA extraction. Enhancer strength was normalized to the wild-type variant ($\log_2$ set to 0). A sliding average (window size = 6 bp) of the mean enhancer strength for all variants at a given position is shown. The shaded area indicates the region where the \segment{A} and \segment{B} segments overlap. Mutation-sensitive regions in the \segment{B} enhancer segments are indicated by shaded rectangles labeled a\textendash e.
+			}%
+			\label{fig:PEV_ld_MutSens}%
+		\end{fig}
+		
+		\begin{fig}
+			\input{Figure3}%
+			\caption{%
+				\captiontitle{Mutation-sensitive regions harbor transcription factor binding sites}%
+				\subfig{A} 4 to 5 mutation-sensitive regions (shaded rectangles; labeled a\textendash e) were defined for the \segment{B} segments of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers. The mutational sensitivity plots are reproduced from \cref{fig:PEV_ld_MutSens}.\nextentry
+				\subfigrange{B}{E} Sequence logo plots were generated from the enhancer strength in the \light{} \parensubfigrange{B}{D} or \dark{} \parensubfig{E} of all possible single-nucleotide substitution variants within the indicated mutation-sensitive regions of the \enhancer{AB80} \parensubfig{B}, \enhancer{Cab-1} \parensubfig{C}, or \enhancer{rbcS-E9} \parensubfigtwo{D}{E} enhancers. The sequence of the wild-type enhancer and the position along it is shown on the x axis. Letters with dark colors in the logo plot represent wild-type bases. The sequence logos for each region were compared to known transcription factor binding motifs and significant matches are shown below the plots.
+			}%
+			\label{fig:PEV_ld_motifs}
+		\end{fig}
+		
+		\begin{fig}
+			\input{Figure4}%
+			\caption{%
+				\captiontitle{Circadian oscillation is robustly encoded in the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers}%
+				\subfig{A} All possible single-nucleotide variants of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers were subjected to Plant STARR-seq in tobacco leaves. On the morning of the third day after transformation (\timepoint{-8}), the plants were shifted to constant light. Leaves were harvested for RNA extraction starting at mid-day (\timepoint{0}) and in 6 hour intervals (\timepoint{6}, 20, 26, and 32) afterwards.\nextentry
+				\subfig{B} A sine wave with a period of 24 h was fitted to the enhancer strength of a given variant across all sampled time points. The fitted line is plotted together with the measured data points for the wild-type enhancers. The equilibrium point of the curves was set to 0. The amplitude is shown as a two-sided arrow at the time of highest enhancer strength (peak time). The goodness-of-fit ($R^2$) is indicated. The shaded gray area represents the timing of the dark period if the plants had not been shifted to constant light.\nextentry
+				\subfigtwo{C}{D} Histograms of the difference between the amplitude \parensubfig{C} and peak time \parensubfig{D} of each single-nucleotide variant relative to the wild-type enhancer. For comparison, the difference in enhancer strength at \timepoint{0} is also shown in \parensubfig{C}. Variants with a below average goodness-of-fit are grayed out in \parensubfig{D}.
+			}%
+			\label{fig:PEV_cr}
+		\end{fig}
+		
+		\begin{fig}
+			\input{Figure5}%
+			\caption{%
+				\captiontitle{Epistatic interactions between single-nucleotide deletions}%
+				\subfigtwo{A}{B} Selected single-nucleotide deletion variants of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers and all possible combinations with two of these deletions were subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles \parensubfig{A} or completely in the dark \parensubfig{B} for two days prior to RNA extraction. For each pair of deletions, the expected enhancer strength based on the sum of the effects of the individual deletions (additive model) is plotted against the measured enhancer strength. The color of the points represents the distance between the two deletions in a pair.
+			}%
+			\label{fig:PEVdouble}
+		\end{fig}
+		
+		\begin{fig}
+			\input{Figure6}%
+			\caption{%
+				\captiontitle{The number, spacing, and order of mutation-sensitive regions affects enhancer strength}%
+				\subfig{A} Fragments of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers spanning 1\textendash3 mutation-sensitive regions (shaded rectangles; labeled a\textendash e, ab, abc, bc, de) as well as a control fragment (ctrl) from a mutation-insensitive region in \enhancer{Cab-1} and a shuffled version of the \enhancer{AB80} fragment d were ordered as oligonucleotides. These fragments were randomly combined to create synthetic enhancers with up to three fragments which were then subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (\light) or completely in the dark (\dark) for two days prior to RNA extraction. The mutational sensitivity plots are reproduced from \cref{fig:PEV_ld_MutSens}.\nextentry
+				\subfig{B} Violin plots of the strength of the synthetic enhancers grouped by the number of contained fragments.\nextentry
+				\subfig{C} For each enhancer fragment, the area under the curve (AUC) in the mutational sensitivity plots was calculated and plotted against the fragment's enhancer strength. AUCs in the \dark{} or \light{} for \enhancer{rbcS-E9} fragments c and d, respectively, are shown in \parensubfig{A}. Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancer fragments are indicated. A linear regression line is shown as a dashed line.\nextentry
+				\subfigtwo{D}{E} Plots of the strength of enhancer fragments or fragment combinations (separated by a + sign and shown in the order in which they appear in the construct) in three replicates (points) and the mean strength (lines).\nextentry
+				\subfig{F} Violin plots of the difference in enhancer strength between synthetic enhancers harboring the same two enhancer fragments but in different order. The $p$-value from a two-sided Wilcoxon rank-sum test comparing light and dark results is indicated ($p$).\nextentry
+				Violin plots in \parensubfig{B} and \parensubfig{F} represent the kernel density distribution and the box plots inside represent the median (center line), upper and lower quartiles and 1.5$\times$ interquartile range (whiskers) for all corresponding synthetic enhancers. Numbers at the bottom of each violin indicate the number of elements in each group.
+				Enhancer strength in \parensubfig{B}\subfigrefrange\parensubfig{E} was normalized to a control construct without an enhancer ($\log_2$ set to 0).
+			}%
+			\label{fig:PEF_cooperativity}
+		\end{fig}
+		
+		\begin{fig}
+			\input{Figure7}%
+			\caption{%
+				\captiontitle{Enhancer fragments can be used to build condition-specific synthetic enhancers}%
+				\subfig{A} Plot of the strength of synthetic enhancers created by randomly combining up to three fragments derived from mutation-sensitive regions of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers (see \cref{fig:PEF_cooperativity}\subfigunformatted{A}) as measured by Plant STARR-seq in the \light{} or \dark. The synthetic enhancers were grouped into four categories: inactive, $\log_2$(enhancer strength) \textle{} 1 in both conditions; constitutive, similar strength in both conditions;  light-activated, at least two-fold more active in the light; dark-activated, at least two-fold more active in the dark. The number ($n$) of synthetic enhancers in each category is indicated.\nextentry
+				\subfig{B} Dual-luciferase reporter constructs (see \cref{fig:PEfl_fwd}\subfigunformatted{D}) were created for 11 synthetic enhancers (syn1\textendash 11). Nanoluciferase activity was measured in at least 4 T2 plants from these lines and normalized to the activity of luciferase. The NanoLuc/Luc ratio was normalized to a control construct without an enhancer (none; $\log_2$ set to 0). Box plots are as defined in \cref{fig:PEfl_fwd}\subfigunformatted{E}.
+				\subfig{C} The mean NanoLuc/Luc ratio was compared to the mean enhancer strength determined by STARR-seq. A linear regression line is shown as a dashed line. Error bars represent the 95\% confidence interval. The constituent fragments of the synthetic enhancers are indicated with fragments separated by a + sign. The first letter indicates the  enhancer from which the fragment is derived (A, \enhancer{AB80}; C, \enhancer{Cab-1}; R, \enhancer{rbcS-E9}) and the lowercase letters represent the fragment name.\nextentry
+				\subfig{D} A linear model was built to predict the strength of the synthetic enhancers based on the strength of the constituent individual fragments. Hexbin plots (color represents the count of points in each hexagon) of the correlation between the model's prediction and the measured data are shown.\nextentry
+				In \parensubfig{C}\subfigrefand\parensubfig{D}, Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of synthetic enhancers are indicated.
+			}%
+			\label{fig:PEF_model}
+		\end{fig}
+
+	
+	\fi
+	%%% Main figures end
+	
+	%%% Supplementary figures start
+	\ifsupp
+		
+		\begin{sfig}
+			\input{SuppFig1}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEfl_fwd}}]{Enhancer strength and light-responsiveness is orientation-independent}%
+				\subfigtwo{A}{B} Full-length (FL) enhancers, as well as 169-bp long segments from their 5\textprime{} or 3\textprime{} end, of the \textit{Pisum sativum} \enhancer{AB80} and \enhancer{rbcS-E9} genes and the \textit{Triticum aestivum} \enhancer{Cab-1} gene were cloned in the forward (fwd; data reproduced from \cref{fig:PEfl_fwd}, \subfigunformatted{B}\subfigrefand\subfigunformatted{C}) or reverse (rev) orientation upstream of the 35S minimal promoter driving the expression of a barcoded GFP reporter gene. All constructs were pooled and the viral 35S enhancer was added as an internal control. The pooled enhancer library was subjected to Plant STARR-seq in tobacco leaves with plants grown for 2 days in normal light/dark cycles \parensubfig{A} or completely in the dark \parensubfig{B} prior to RNA extraction. Enhancer strength was normalized to a control construct without an enhancer ($\log_2$ set to 0).\nextentry
+				\subfig{C} Light-responsiveness ($\log_2$[enhancer strength\textsuperscript{\light}/enhancer strength\textsuperscript{\dark}]) was determined for the indicated enhancer segments.\nextentry
+				Box plots represent the median (center line), upper and lower quartiles (box limits), 1.5$\times$ interquartile range (whiskers), and outliers (points) for all corresponding barcodes from two replicates. Numbers at the bottom of each box plot indicate the number of barcodes in each group.
+			}%
+			\label{sfig:PEfl_ori}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig2}%
+			\nextpagecaption{%
+				\captiontitle[\supports{all figures}]{Plant STARR-seq yields highly reproducible results}%
+				\subfigrange{A}{I} Correlation between biological replicates of Plant STARR-seq for the enhancer library used in \cref{fig:PEfl_fwd,sfig:PEfl_ori} \parensubfig{A}, the single-nucleotide enhancer variants library used in \cref{fig:PEV_ld_MutSens,fig:PEV_ld_motifs,fig:PEV_cr,sfig:PEV_ld_summary,sfig:PEV_ld_heatmaps,sfig:PEV_ld_fimo,sfig:PEV_cr_0vs24,sfig:PEV_cr_heatmap_AB80,sfig:PEV_cr_heatmap_Cab-1,sfig:PEV_cr_heatmap_rbcS-E9,sfig:PEV_cr_MutSens,sfig:PEval_cor_main,sfig:PEV_overlap} \parensubfigrange{B}{E}, the synthetic enhancer library used in \cref{fig:PEF_cooperativity,fig:PEF_model,sfig:PEval_cor_main,sfig:PEF_model_lr,sfig:PEF_fragments} \parensubfigrange{F}{H}, and the combined double-deletion and synthetic enhancer valdiation library used in \cref{fig:PEVdouble,sfig:PEval_cor_main} \parensubfig{I} performed under the indicated condition or at the indicated time points.\nextentry
+				Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancer variants or enhancer fragment combinations are indicated. The color in the hexbin plots in \parensubfigrange{B}{I} represents the count of points in each hexagon.
+			}%
+			\label{sfig:repCor}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig3}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEfl_fwd}}]{The dual-luciferase assay cannot detect light-responsive enhancer activity}%
+				\subfig{A} Transgenic \textit{Arabidopsis} lines were generated with constructs harboring a constitutively expressed luciferase (Luc) gene and a nanoluciferase (NanoLuc) gene under control of a 35S minimal promoter coupled to the 35S enhancer or the \segment{B} segments of the \enhancer{AB80}, \enhancer{Cab-1}, or \enhancer{rbcS-E9} enhancers (see \cref{fig:PEfl_fwd}\subfigunformatted{D}). Nanoluciferase activity was measured in 3\textendash 5 T2 plants from these lines and normalized to the activity of luciferase. Plants were either grown in normal light/dark cycles ($+$ light; data reproduced from \cref{fig:PEfl_fwd}\subfigunformatted{E}) or shifted to complete darkness (\textminus{} light) for 4 days prior to sample collection. The NanoLuc/Luc ratio was normalized to a control construct without an enhancer (none; $\log_2$ set to 0). Box plots represent the median (center line), upper and lower quartiles (box limits), 1.5$\times$ interquartile range (whiskers), and outliers (points) for all corresponding plant lines from two (\textminus{} light) or three ($+$ light) independent replicates. Numbers at the bottom of each box plot indicate the number of samples in each group.
+			}%
+			\label{sfig:DL_light_dark}
+		\end{sfig}
+
+		\begin{sfig}
+			\input{SuppFig4}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_ld_MutSens,fig:PEV_ld_motifs}}]{Few single-nucleotide mutations have a strong effect on enhancer strength}%
+				\subfigtwo{A}{B} All possible single-nucleotide substitution, deletion, and insertion variants of the \segment{A} \parensubfig{A} and \segment{B} \parensubfig{B} segments of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers were subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (\light) or completely in the dark (\dark) for two days prior to RNA extraction. Enhancer strength was normalized to the wild-type variant ($\log_2$ set to 0). Variants were grouped into three categories: increasing, $\log_2$(enhancer strength)~$> 1$; neutral, $\log_2$(enhancer strength) between \textminus1 and 1;  decreasing, $\log_2$(enhancer strength)~$< -1$. The number of variants in each category is indicated. Neutral variants are shown in a lighter color than increasing and decreasing variants in the histograms.
+			}%
+			\label{sfig:PEV_ld_summary}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig5}%
+			\nextpagecaption{%
+				\captiontitle[\supports{\cref{fig:PEV_ld_MutSens,fig:PEV_ld_motifs}}]{Saturation mutagenesis reveals mutation-sensitive patches in plant enhancers}%
+				\subfigrange{A}{C} All possible single-nucleotide substitution, deletion, and insertion variants of the \segment{A} and \segment{B} segments of the \enhancer{AB80} \parensubfig{A}, \enhancer{Cab-1} \parensubfig{B}, and \enhancer{rbcS-E9} \parensubfig{C} enhancers were subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (\light) or completely in the dark (\dark) for two days prior to RNA extraction. Enhancer strength was normalized to the wild-type variant ($\log_2$ set to 0) and plotted as a heatmap. Missing values are shown in light gray and wild-type variants are marked with a gray dot.
+			}%
+			\label{sfig:PEV_ld_heatmaps}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig6}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_ld_MutSens}}]{Effects of mutations in the overlap region of the \segment{A} and \segment{B} enhancer segments are more similar in the dark}%
+				\subfig{A} All possible single-nucleotide substitution, deletion, and insertion variants of the \segment{A} and \segment{B} segments of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers were subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (\light) or completely in the dark (\dark) for two days prior to RNA extraction. Enhancer strength was normalized to the wild-type variant ($\log_2$ set to 0). For mutations located in the overlap region between the two segments (positions 79\textendash169 in \enhancer{AB80}, positions 100\textendash169 in \enhancer{Cab-1}, and positions 66\textendash169 in \enhancer{rbcS-E9}), the normalized enhancer strength measured in the context of the \segment{A} segment (x axis) is compared against the normalized enhancer strength measured in the context of the \segment{B} segment (y axis). Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancer variants are indicated.
+			}%
+			\label{sfig:PEV_overlap}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig7}%
+			\nextpagecaption{%
+				\captiontitle[\supports{\cref{fig:PEV_ld_motifs}}]{Mutation-sensitive regions contain few strong matches to known transcription factor binding motifs}%
+				\subfigrange{A}{C} The wild-type sequences of the \segment{A} and \segment{B} segments of the \enhancer{AB80} \parensubfig{A}, \enhancer{Cab-1} \parensubfig{B}, and \enhancer{rbcS-E9} \parensubfig{C} enhancers were scanned for significant matches to known transcription factor binding motifs. Hits are shown as gray areas overlaid on the mutational sensitivity plots reproduced from \cref{fig:PEV_ld_MutSens}. The ID of the matching transcription factor motif is indicated.\nextentry
+				\subfig{D} For each transcription factor motif ID, the table lists the families of transcription factors that can bind to it and the consensus binding site sequence. Ambiguous nucleotides in the consensus sequence are shown as lowercase and correspond to: n = A, C, G, or T; d = A, G, or T; r = A or G; w = A or T; m = A or C.
+			}%
+			\label{sfig:PEV_ld_fimo}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig8}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_cr}}]{Strong correlation between Plant STARR-seq samples obtained 24 hours apart from each other}%
+				\subfig{A} All possible single-nucleotide variants of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers were subjected to Plant STARR-seq in tobacco leaves. On the morning of the third day after transformation (\timepoint{-8}), the plants were shifted to constant light. Leaves were harvested for RNA extraction starting at mid-day (\timepoint{0}) and in 6 hour intervals (\timepoint{6}, 20, 26, and 32) afterwards. Hexbin plots (color represents the count of points in each hexagon) of the correlation between samples obtained at the indicated time points are shown. Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancer variants are indicated.\nextentry
+				\subfig{B} Hexbin plots of the correlation between the samples from the time course experiment described above compared to the same library tested in normal light/dark cycles (light) as described in \cref{fig:PEV_ld_MutSens}. The "light" samples were harvested at \timepoint{0}.
+			}%
+			\label{sfig:PEV_cr_0vs24}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig9}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_cr}}]{Saturation mutagenesis maps of the \enhancer{AB80} enhancer do not change much over time in constant light}%
+				\subfig{A} All possible single-nucleotide variants of the \enhancer{AB80} enhancer were subjected to Plant STARR-seq in tobacco leaves. On the morning of the third day after transformation (\timepoint{-8}), the plants were shifted to constant light. Leaves were harvested for RNA extraction starting at mid-day (\timepoint{0}) and in 6 hour intervals (\timepoint{6}, 20, 26, and 32) afterwards. Enhancer strength was normalized to the wild-type variant ($\log_2$ set to 0) and plotted as a heatmap. Missing values are shown in light gray and wild-type variants are marked with a gray dot.
+			}%
+			\label{sfig:PEV_cr_heatmap_AB80}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig10}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_cr}}]{Saturation mutagenesis maps of the \enhancer{Cab-1} enhancer do not change much over time in constant light}%
+				\subfig{A} The \enhancer{Cab-1} enhancer was subjected to the same experiment as the \enhancer{AB80} enhancer in \cref{sfig:PEV_cr_heatmap_AB80}.
+			}%
+			\label{sfig:PEV_cr_heatmap_Cab-1}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig11}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_cr}}]{Saturation mutagenesis maps of the \enhancer{rbcS-E9} enhancer do not change much over time in constant light}%
+				\subfig{A} The \enhancer{rbcS-E9} enhancer was subjected to the same experiment as the \enhancer{AB80} enhancer in \cref{sfig:PEV_cr_heatmap_AB80}.
+			}%
+			\label{sfig:PEV_cr_heatmap_rbcS-E9}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig12}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_cr}}]{Mutation-sensitive regions of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers are conserved over time in constant light}%
+				\subfigrange{A}{C} All possible single-nucleotide substitution, deletion, and insertion variants of the \segment{A} and \segment{B} segments of the \enhancer{AB80} \parensubfig{A}, \enhancer{Cab-1} \parensubfig{B}, and \enhancer{rbcS-E9} \parensubfig{C} enhancers were subjected to Plant STARR-seq in tobacco leaves. On the morning of the third day after transformation (\timepoint{-8}), the plants were shifted to constant light. Leaves were harvested for RNA extraction starting at mid-day (\timepoint{0}) and in 6 hour intervals (\timepoint{6}, 20, 26, and 32) afterwards. Enhancer strength was normalized to the wild-type variant ($\log_2$ set to 0). A sliding average (window size = 6 bp) of the mean enhancer strength for all variants at a given position is shown. The shaded area indicates the region where the \segment{A} and \segment{B} segments overlap.
+			}%
+			\label{sfig:PEV_cr_MutSens}%
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig13}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEV_ld_MutSens,fig:PEV_ld_motifs,fig:PEF_cooperativity,fig:PEF_model,fig:PEVdouble}}]{Plant STARR-seq experiments are reproducible across libraries}%
+				\subfig{A} Correlation between the enhancer strength of single-nucleotide deletion variants of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers present in the comprehensive single-nucleotide enhancer variants library (described in \cref{fig:PEV_ld_MutSens}) and in a second, independent library with single- and double-deletion enhancer variants (described in \cref{fig:PEVdouble}).\nextentry
+				\subfig{B} Correlation between the strength of synthetic enhancers created by combining fragments of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers as measured in the large-scale library (described in \cref{fig:PEF_cooperativity}) and in a second, smaller validation library. Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancer variants are indicated.
+			}%
+			\label{sfig:PEval_cor_main}%
+		\end{sfig}
+
+		\begin{sfig}
+			\input{SuppFig14}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEF_cooperativity}}]{Correct spacing between mutation-sensitive regions is required for full activity}%
+				\subfig{A} Plots of the strength in the indicated condition of enhancer fragments or fragment combinations (separated by a + sign and shown in the order in which they appear in the construct) in three replicates (points) and the mean strength (lines). Enhancer strength was normalized to a control construct without an enhancer ($\log_2$ set to 0). Some plots are reproduced from \cref{fig:PEF_cooperativity}, \subfigunformatted{D}\subfigrefand\subfigunformatted{E}.
+			}
+			\label{sfig:PEF_fragments}
+		\end{sfig}
+		
+		\begin{sfig}
+			\input{SuppFig15}%
+			\caption{%
+				\captiontitle[\supports{\cref{fig:PEF_model}}]{A linear model can predict the \lightResp{} of synthetic enhancers}%
+				\subfig{A} A linear model was built to predict the \lightResp{} of synthetic enhancers created by randomly combining up to three fragments derived from mutation-sensitive regions of the \enhancer{AB80}, \enhancer{Cab-1}, and \enhancer{rbcS-E9} enhancers (see \cref{fig:PEF_cooperativity}\subfigunformatted{A}) based on the \lightResp{} of the constituent individual fragments. A hexbin plot (color represents the count of points in each hexagon) of the correlation between the model's prediction and the measured data is shown. Pearson's $R^2$, Spearman's $\rho$, and number ($n$) of enhancer fragment combinations are indicated.
+			}%
+			\label{sfig:PEF_model_lr}
+		\end{sfig}
+
+	\fi
+	%%% Supplementary figures end
+
+\end{document}

@@ -1,0 +1,92 @@
+\begin{tikzpicture}
+	\addtolength{\plotylabelwidth}{\baselineskip}
+
+	%%% PEV cr: correlation between time points
+	\coordinate (timepoints) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt] (ptitle) at (timepoints) {\vphantom{\timepoint{24}}};
+	
+	\distance{ptitle.south}{ptitle.north}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(timepoints)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_cor_timepoints_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+		colormap name = viridis,
+		colorbar hexbin,
+		ylabel = {\textbf{\timepoint{0}}:\\$\log_2$(enhancer strength)}
+	]{\textwidth - \ydistance}{4}{\textbf{\timepoint{6}\textendash\timepoint{24}}: $\log_2$(enhancer strength)}
+	
+		\pgfplotsinvokeforeach{6, 12, 18, 24}{
+			\nextgroupplot[
+				title = {\timepoint{#1}},
+				title color = t#1,
+				last plot style = {colorbar}
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEV_cr_cor_0vs#1_hexbin.tsv};
+				
+				% correlation
+				\stats{rawData/PEV_cr_cor_0vs#1};
+		}
+		
+	\end{hgroupplot}
+	
+	\distance{group c4r1.south}{group c4r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = t0!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c4r1.north east) {\timepoint{0}};
+	
+	
+	%%% PEV cr: correlation with PEV ld 
+	\coordinate[yshift = -\columnsep] (CRvsLD) at (timepoints |- xlabel.south);
+	
+	\node[anchor = north west, text depth = 0pt] (ptitle) at (CRvsLD) {\vphantom{\light}};
+	
+	\distance{ptitle.south}{ptitle.north}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(CRvsLD)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_cor_PEV_ld_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+		colormap name = viridis,
+		colorbar hexbin,
+		ylabel = {\textbf{light}:\\$\log_2$(enhancer strength)}
+	]{\textwidth - \ydistance}{5}{\textbf{\timepoint{0}\textendash\timepoint{24}}: $\log_2$(enhancer strength)}
+	
+		\pgfplotsinvokeforeach{0, 6, ..., 24}{
+			\nextgroupplot[
+				title = {\timepoint{#1}},
+				title color = t#1,
+				last plot style = {colorbar}
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEV_cr_cor_PEV_ld_#1_hexbin.tsv};
+				
+				% correlation
+				\ifnum#1=6\relax
+					\def\thispos{south east}
+				\else
+					\def\thispos{north west}
+				\fi
+				
+				\stats[stats position = \thispos]{rawData/PEV_cr_cor_PEV_ld_#1};
+			}
+			
+	\end{hgroupplot}
+	
+	\distance{group c5r1.south}{group c5r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c5r1.north east) {\light};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{timepoints}
+	\subfiglabel{CRvsLD}
+
+\end{tikzpicture}

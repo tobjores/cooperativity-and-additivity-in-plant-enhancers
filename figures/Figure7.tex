@@ -1,0 +1,241 @@
+\begin{tikzpicture}
+	%%% commands to create legend entries from a table
+	\newcommand{\getlegendentries}{
+		\pgfplotstableread{rawData/PEF_strength_legend.tsv}\loadedtable%
+		\pgfplotstableforeachcolumn\loadedtable\as\col{%
+			\pgfplotstablegetelem{0}{\col}\of\loadedtable%
+			\edef\thisentry{%
+				\noexpand\addlegendentry{%
+					\noexpand\vphantom{($n = 1$)}\\\col\\($n = \pgfmathprintnumber{\pgfplotsretval}$)%
+				}%
+			}%
+			\thisentry%
+		}%
+	}
+	
+	\newcommand{\getlegendentriessynenh}{
+		\pgfplotstableread{rawData/DL_synEnh_cor_points.tsv}\loadedtable%
+		\pgfplotstableforeachcolumnelement{enhancer}\of\loadedtable\as\thisenh{%
+			\pgfplotstablegetelem{\pgfplotstablerow}{synEnh}\of\loadedtable%
+			\edef\thisentry{%
+				\noexpand\addlegendentry{%
+					\ifx\thisenh\pgfplotsretval%
+						\thisenh%
+					\else%
+						\noexpand\vphantom{\pgfplotsretval}\\\thisenh\\\pgfplotsretval%
+					\fi%
+				}%
+			}%
+			\thisentry%
+		}%
+	}
+	
+	
+	%%% define colors for synthetic enhancers
+	\pgfplotsforeachungrouped \x in {1, ..., 11}{
+		\pgfmathint{max((6 - \x) * 100 / 5, 0)}
+		\edef\tempA{\pgfmathresult}
+		\pgfmathint{min((11 - \x) * 100 / 5, 100)}
+		\edef\tempB{\pgfmathresult}
+		\colorlet{syn\x}{AB80!\tempA!Cab-1!\tempB!rbcS-E9}
+	}
+
+
+	%%% PEF: enhancer strength in light and dark
+	\coordinate[yshift = -\columnsep] (strength) at (0, 0);
+	
+	\begin{axis}[
+		anchor = above north west,
+		at ={(strength)},
+		xshift = \plotylabelwidth + \baselineskip,
+		width = \threecolumnwidth - \plotylabelwidth,
+		axis limits from table = {rawData/PEF_strength_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		legend style = {
+			anchor = north west,
+			at = {(1, 1)},
+			font = \figsmall,
+			cells = {align = left},
+			inner ysep = 0pt
+		},
+		legend image post style = {fill opacity = 1, mark size = 1.25},
+		legend plot pos = left,
+		legend cell align = left,
+		scatter/classes = {
+			inactive={gray},
+			constitutive={35S enhancer},
+			light-activated={light},
+			dark-activated={dark}
+		},
+		show diagonal,
+		xlabel = {\textbf{\light}: $\log_2$(enhancer strength)},
+		ylabel = {\textbf{\dark}:\\$\log_2$(enhancer strength)},
+		xlabel style = {name = strength xlabel}
+	]
+	
+		% scatter plot
+		\addplot[
+			scatter,
+			scatter src = explicit symbolic,
+			only marks,
+			mark = solido,
+			fill opacity = .5
+		] table[x = light, y = dark, meta = type] {rawData/PEF_strength_points.tsv};
+		
+		% legend
+		\getlegendentries
+	
+	\end{axis}
+	
+	
+	%%% dual-luciferase plot
+	\coordinate (DL plot) at (strength -| \textwidth - \twocolumnwidth - \baselineskip, 0);
+	
+	\begin{axis}[%
+		anchor = north west,
+		at = {(DL plot)},
+		width = \twocolumnwidth - \plotylabelwidth,
+		xshift = \plotylabelwidth + \baselineskip,
+		x grids = false,
+		axis limits from table = {rawData/DL_synEnh_axes.tsv},
+		zero line,
+		ylabel = $\log_2$(NanoLuc/Luc),
+		x tick table = {rawData/DL_synEnh_boxplot.tsv}{sample},
+		xticklabel style = {rotate = 45, anchor = north east},
+	]
+
+		% boxplots
+		\boxplots{%
+			box colors from table = {rawData/DL_synEnh_boxplot.tsv}{sample},
+			fill opacity = .5
+		}{rawData/DL_synEnh}
+		
+		% add sample size
+		\samplesize[nodes near coords style = {name = samplesize}]{rawData/DL_synEnh_boxplot.tsv}{id}{n}
+
+	\end{axis}
+	
+	
+	%%% correlation between Plant STARR-seq and dual-luciferase assay
+	\coordinate[yshift = -\columnsep] (DL cor) at (strength |- strength xlabel.south);
+	
+	% will be drawn after next plot
+	
+	
+	%%% predict enhancer strength from single fragments
+	\coordinate (predict ld) at (DL cor -| \textwidth - \twocolumnwidth - \baselineskip, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(predict ld)}, xshift = \plotylabelwidth + \baselineskip},
+		axis limits from table = {rawData/PEF_cor_prediction_strength_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+		colormap name = viridis,
+		colorbar hexbin,
+		ylabel = {\textbf{measurement}:\\$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{\textbf{prediction}: $\log_2$(enhancer strength)}
+	
+		\nextgroupplot[
+			title = {\light},
+			title color = light,
+		]
+		
+			% hexbin plot
+			\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEF_cor_prediction_strength_light_hexbin.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEF_cor_prediction_strength_light}
+			
+			
+		\nextgroupplot[
+			title = {\dark},
+			title color = dark,
+			colorbar,
+		]
+		
+			% hexbin plot
+			\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEF_cor_prediction_strength_dark_hexbin.tsv};
+			
+			% correlation
+			\stats{rawData/PEF_cor_prediction_strength_dark}
+			
+	\end{hgroupplot}
+	
+	
+	%%% correlation between Plant STARR-seq and dual-luciferase assay (continued)
+	
+	\distance{group c1r1.south west}{group c1r1.above north east}
+	
+	\begin{axis}[
+		anchor = north west,
+		at = {(DL cor)},
+		xshift = \plotylabelwidth,
+		width = \xdistance,
+		height = \ydistance,
+		axis limits from table = {rawData/DL_synEnh_cor_axes.tsv},
+		enlargelimits = .1,
+		xlabel = {$\log_2$(enhancer strength)},
+		xlabel style = {name = xlabel},
+		ylabel = {$\log_2$(NanoLuc/Luc)},
+		scatter/classes = {
+			none={black},
+			35S={35S enhancer},
+			syn1={syn1},
+			syn2={syn2},
+			syn3={syn3},
+			syn4={syn4},
+			syn5={syn5},
+			syn6={syn6},
+			syn7={syn7},
+			syn8={syn8},
+			syn9={syn9},
+			syn10={syn10},
+			syn11={syn11}
+		},
+		legend style = {
+			anchor = north west,
+			at = {(1, 1)},
+			font = \figsmall,
+			cells = {align = left, row sep = -2ex},
+			inner ysep = 0pt
+		},
+		legend image post style = {fill opacity = 1, mark size = 1.25},
+		legend plot pos = left,
+		legend cell align = left,
+		legend columns = 2,
+	]
+	
+		% regression line
+		\addplot [draw = none, forget plot] table [x = enrichment, y = {create col/linear regression = { y = l2ratio}}] {rawData/DL_synEnh_cor_points.tsv};
+		
+		\draw[gray, dashed] (\xmin, \xmin * \pgfplotstableregressiona + \pgfplotstableregressionb) -- (\xmax, \xmax * \pgfplotstableregressiona + \pgfplotstableregressionb);
+	
+		% scatter plot
+		\addplot [
+			scatter,
+			scatter src = explicit symbolic,
+			only marks,
+			mark = solido,
+			mark size = 2,
+			error bars/y dir = both,
+			error bars/y explicit,
+		] table[x = enrichment, y = l2ratio, meta = enhancer, y error = CI] {rawData/DL_synEnh_cor_points.tsv};
+		
+		% correlation
+		\stats{rawData/DL_synEnh_cor}
+		
+		% legend
+		\getlegendentriessynenh
+	
+	\end{axis}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{strength}
+	\subfiglabel{DL plot}
+	\subfiglabel{DL cor}
+	\subfiglabel{predict ld}
+
+\end{tikzpicture}

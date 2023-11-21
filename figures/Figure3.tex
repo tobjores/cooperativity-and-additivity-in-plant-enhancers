@@ -1,0 +1,307 @@
+%%% command to draw grouped logo plots
+% \logogroupplot[<plot options>]{<enhancer>}{<region>}{<condition>}{<relative plot width>}
+\newcommand{\logogroupplot}[5][]{
+	\nextgroupplot[
+		width = #5*\plotwidth,
+		title = {\enhancer{#2} region \textbf{#3}},
+		title style = {minimum width = #5*\plotwidth},
+		show sequence = {rawData/PEV_ld_seqLogo_#2_#3_#4.tsv}{WT},
+		alias = {logo #2 #3},
+		#1,
+	]
+	
+		\addlogoplot{rawData/PEV_ld_seqLogo_#2_#3_#4.tsv};
+}
+
+\begin{tikzpicture}
+	\setlength{\groupplotsep}{\columnsep}
+
+	%%% fragment overview
+	\coordinate (overview) at (0, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(overview)}, xshift = \columnsep},
+		height = 1.5cm,
+		axis lines = none,
+		title style = {signal, anchor = south west, at = {(0, 1)}, minimum width = \plotwidth - 1.25\pgflinewidth},
+		zero line,
+		clip = false,
+		legend style = {anchor = south west, at = {(0, 0)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+		enlarge y limits = .05
+	]{\textwidth + \plotylabelwidth - \columnsep}{3}{}
+		
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer \segment{B} segment,
+			title color = AB80,
+			axis limits from table = {rawData/PEV_ld_mutSens_AB80_recap_axes.tsv},
+			axis limits = AB80 B,
+		]
+		
+			\enhFrag[-1]{168}{23}{AB80}{a}
+			\enhFrag[-1]{193}{19}{AB80}{b}
+			\enhFrag[0]{205}{19}{AB80}{c}
+			\enhFrag[-1]{228}{23}{AB80}{d}
+			
+			\pgfplotsinvokeforeach{a, b, c, d}{
+				\fill[AB80, fill opacity = .1] (AB80 #1.north west) rectangle (AB80 #1.east |- 0, \ymax);
+			}
+			
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_AB80_B_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_AB80_B_lines.tsv};
+			
+			\legend{dark, light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer \segment{B} segment,
+			title color = Cab-1,
+			axis limits from table = {rawData/PEV_ld_mutSens_Cab-1_recap_axes.tsv},
+			axis limits = Cab-1 B,
+		]
+		
+			\enhFrag[-1]{149}{19}{Cab-1}{a}
+			\enhFrag[-1]{179}{21}{Cab-1}{b}
+			\enhFrag[0]{193}{19}{Cab-1}{c}
+			\enhFrag[-1]{220}{25}{Cab-1}{d}
+			\enhFrag[0]{239}{19}{Cab-1}{e}
+			
+			\pgfplotsinvokeforeach{a, b, c, d, e}{
+				\fill[Cab-1, fill opacity = .1] (Cab-1 #1.north west) rectangle (Cab-1 #1.east |- 0, \ymax);
+			}
+		
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_Cab-1_B_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_Cab-1_B_lines.tsv};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer \segment{B} segment,
+			title color = rbcS-E9,
+			axis limits from table = {rawData/PEV_ld_mutSens_rbcS-E9_recap_axes.tsv},
+			axis limits = rbcS-E9 B,
+		]
+			
+			\enhFrag[-1]{109}{17}{rbcS-E9}{a}
+			\enhFrag[0]{120}{17}{rbcS-E9}{b}
+			\enhFrag[-1]{141}{21}{rbcS-E9}{c}
+			\enhFrag[-1]{173}{25}{rbcS-E9}{d}
+			\enhFrag[0]{193}{21}{rbcS-E9}{e}
+			
+			\pgfplotsinvokeforeach{a, b, c, d, e}{
+				\fill[rbcS-E9, fill opacity = .1] (rbcS-E9 #1.north west) rectangle (rbcS-E9 #1.east |- 0, \ymax);
+			}
+		
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv};
+		
+	\end{hgroupplot}
+	
+	
+	%%% AB80 sequence logos
+	\coordinate[yshift = -\columnsep] (AB80 logos) at (overview |- AB80 a.south);
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(AB80 logos)}, yshift = -\columnsep},
+		height = .67cm,
+		title style = {fill = AB80!50, draw = none},
+		axis background/.style = {fill = AB80!10},
+		logo axis = position,
+		logo plot,
+		xlabel style = {anchor = south}
+	]{\textwidth + \plotylabelwidth}{4}{}
+		
+		\logogroupplot{AB80}{a}{light}{23/21}
+		\logogroupplot{AB80}{b}{light}{19/21}
+		\logogroupplot{AB80}{c}{light}{19/21}
+		\logogroupplot[save base width]{AB80}{d}{light}{23/21}
+		
+	\end{hgroupplot}
+	
+	\fill[light!20] (AB80 logos) rectangle (group c4r1.above north east) node[pos = .5, text = black, font = \bfseries, text depth = 0pt] {\light};
+	
+	% matching transcription factors
+	\pgfplotstableread{rawData/PEV_ld_TF-matches_AB80_light.tsv}{\TFmatches}
+	\getrows{\TFmatches}
+	\foreach \x [evaluate = \x as \xx using int(\x - 1)] in {1, ..., \datarows}{
+		\pgfplotstableforeachcolumn{\TFmatches}\as{\col}{
+			\pgfplotstablegetelem{\xx}{\col}\of{\TFmatches}
+			\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+		}
+		\logoplot[%
+			anchor = north west,
+			at = {(logo AB80 \thisregion.below south west)},
+			xshift = \thisoffset\basewidth,
+			width = \thislength\basewidth,
+			height = .67cm,
+			logo axis = none,
+			axis background/.style = {fill = none}
+		]{rawData/seqLogo_\thisTF_\thisorientation.tsv}
+		\ifnum\thisoffset=0\relax
+			\node[anchor = east, align = right, font = \bfseries] at (last plot.west) {\textbf{\thisTFfamily}};
+		\else
+			\node[anchor = west, align = left, font = \bfseries] at (last plot.east) {\textbf{\thisTFfamily}};
+		\fi
+	}
+	
+	\begin{pgfonlayer}{background}
+		\fill[light!10] (AB80 logos) rectangle (group c4r1.east |- last plot.south);
+	\end{pgfonlayer}
+	
+	
+	%%% Cab-1 sequence logos
+	\coordinate[yshift = -\columnsep] (Cab-1 logos) at (overview |- last plot.below south);
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(Cab-1 logos)}, yshift = -\columnsep},
+		height = .67cm,
+		title style = {fill = Cab-1!50, draw = none},
+		axis background/.style = {fill = Cab-1!10},
+		logo axis = position,
+		logo plot,
+		xlabel style = {anchor = south}
+	]{\textwidth + \plotylabelwidth}{5}{}
+		
+		\logogroupplot[xtick = {145, 150, 155}]{Cab-1}{a}{light}{19/20.6}
+		\logogroupplot{Cab-1}{b}{light}{21/20.6}
+		\logogroupplot{Cab-1}{c}{light}{19/20.6}
+		\logogroupplot{Cab-1}{d}{light}{25/20.6}
+		\logogroupplot[save base width]{Cab-1}{e}{light}{19/20.6}
+		
+	\end{hgroupplot}
+	
+	\fill[light!20] (Cab-1 logos) rectangle (group c5r1.above north east) node[pos = .5, text = black, font = \bfseries, text depth = 0pt] {\light};
+	
+	% matching transcription factors
+	\pgfplotstableread{rawData/PEV_ld_TF-matches_Cab-1_light.tsv}{\TFmatches}
+	\getrows{\TFmatches}
+	\foreach \x [evaluate = \x as \xx using int(\x - 1)] in {1, ..., \datarows}{
+		\pgfplotstableforeachcolumn{\TFmatches}\as{\col}{
+			\pgfplotstablegetelem{\xx}{\col}\of{\TFmatches}
+			\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+		}
+		\logoplot[%
+			anchor = north west,
+			at = {(logo Cab-1 \thisregion.below south west)},
+			xshift = \thisoffset\basewidth,
+			width = \thislength\basewidth,
+			height = .67cm,
+			logo axis = none,
+			axis background/.style = {fill = none}
+		]{rawData/seqLogo_\thisTF_\thisorientation.tsv}
+		\node[anchor = west, align = left, font = \bfseries] at (last plot.east) {\textbf{\thisTFfamily}};
+	}
+	
+	\begin{pgfonlayer}{background}
+		\fill[light!10] (Cab-1 logos) rectangle (group c5r1.east |- last plot.south);
+	\end{pgfonlayer}
+	
+	
+	%%% rbcS-E9 sequence logos
+	\coordinate[yshift = -\columnsep] (rbcS-E9 logos) at (overview |- last plot.below south);
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(rbcS-E9 logos)}, yshift = -\columnsep},
+		height = .67cm,
+		title style = {fill = rbcS-E9!50, draw = none},
+		axis background/.style = {fill = rbcS-E9!10},
+		logo axis = position,
+		logo plot,
+		xlabel style = {anchor = south}
+	]{\textwidth + \plotylabelwidth}{5}{}
+		
+		\logogroupplot{rbcS-E9}{a}{light}{17/20.2}
+		\logogroupplot{rbcS-E9}{b}{light}{17/20.2}
+		\logogroupplot{rbcS-E9}{c}{light}{21/20.2}
+		\logogroupplot{rbcS-E9}{d}{light}{25/20.2}
+		\logogroupplot[save base width]{rbcS-E9}{e}{light}{21/20.2}
+		
+	\end{hgroupplot}
+	
+	\fill[light!20] (rbcS-E9 logos) rectangle (group c5r1.above north east) node[pos = .5, text = black, font = \bfseries, text depth = 0pt] {\light};
+	
+	% matching transcription factors
+	\pgfplotstableread{rawData/PEV_ld_TF-matches_rbcS-E9_light.tsv}{\TFmatches}
+	\getrows{\TFmatches}
+	\foreach \x [evaluate = \x as \xx using int(\x - 1)] in {1, ..., \datarows}{
+		\pgfplotstableforeachcolumn{\TFmatches}\as{\col}{
+			\pgfplotstablegetelem{\xx}{\col}\of{\TFmatches}
+			\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+		}
+		\logoplot[%
+			anchor = north west,
+			at = {(logo rbcS-E9 \thisregion.below south west)},
+			xshift = \thisoffset\basewidth,
+			width = \thislength\basewidth,
+			height = .67cm,
+			logo axis = none,
+			axis background/.style = {fill = none}
+		]{rawData/seqLogo_\thisTF_\thisorientation.tsv}
+		\def\regionE{e}
+		\ifx\thisregion\regionE\relax
+			\node[anchor = east, align = right, font = \bfseries] at (last plot.west) {\textbf{\thisTFfamily}};
+		\else
+			\node[anchor = west, align = left, font = \bfseries] at (last plot.east) {\textbf{\thisTFfamily}};
+		\fi
+	}
+	
+	\begin{pgfonlayer}{background}
+		\fill[light!10] (rbcS-E9 logos) rectangle (group c5r1.east |- last plot.south);
+	\end{pgfonlayer}
+	
+	
+	%%% rbcS-E9 sequence logos in dark
+	\coordinate[yshift = -\columnsep] (rbcS-E9 logos dark) at (overview |- last plot.below south);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(rbcS-E9 logos dark)}, yshift = -\columnsep},
+		height = .67cm,
+		title style = {fill = rbcS-E9!50, draw = none},
+		axis background/.style = {fill = rbcS-E9!10},
+		logo axis = position,
+		logo plot,
+		xlabel style = {anchor = south},
+	]{55\basewidth + 2\groupplotsep + \plotylabelwidth}{3}{}
+		
+		\logogroupplot{rbcS-E9}{a}{dark}{17/55*3}
+		\logogroupplot{rbcS-E9}{b}{dark}{17/55*3}
+		\logogroupplot{rbcS-E9}{c}{dark}{21/55*3}
+		
+	\end{hgroupplot}
+	
+	\fill[dark!20] (rbcS-E9 logos dark) rectangle (group c3r1.above north east) node[pos = .5, text = black, font = \bfseries] {\dark};
+	
+	% matching transcription factors
+	\pgfplotstableread{rawData/PEV_ld_TF-matches_rbcS-E9_dark.tsv}{\TFmatches}
+	\getrows{\TFmatches}
+	\foreach \x [evaluate = \x as \xx using int(\x - 1)] in {1, ..., \datarows}{
+		\pgfplotstableforeachcolumn{\TFmatches}\as{\col}{
+			\pgfplotstablegetelem{\xx}{\col}\of{\TFmatches}
+			\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+		}
+		\logoplot[%
+			anchor = north west,
+			at = {(logo rbcS-E9 \thisregion.below south west)},
+			xshift = \thisoffset\basewidth,
+			width = \thislength\basewidth,
+			height = .67cm,
+			logo axis = none,
+			axis background/.style = {fill = none}
+		]{rawData/seqLogo_\thisTF_\thisorientation.tsv}
+		\node[anchor = west, align = left, font = \bfseries] at (last plot.east) {\textbf{\thisTFfamily}};
+	}
+	
+	\begin{pgfonlayer}{background}
+		\fill[dark!10] (rbcS-E9 logos dark) rectangle (group c3r1.east |- last plot.south);
+	\end{pgfonlayer}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{overview}
+	\subfiglabel{AB80 logos}
+	\subfiglabel{Cab-1 logos}
+	\subfiglabel{rbcS-E9 logos}
+	\subfiglabel{rbcS-E9 logos dark}
+	
+\end{tikzpicture}

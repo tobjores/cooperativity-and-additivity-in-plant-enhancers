@@ -1,0 +1,149 @@
+\begin{tikzpicture}
+
+	%%% mutation sensitivity (positional mean) AB80
+	\coordinate (AB80) at (0, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(AB80)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_mutSens_AB80_axes.tsv},
+		enlarge y limits = .05,
+		ytick = {-10, ..., 10},
+		ylabel = {$\log_2$(enhancer strength)},
+		title color = AB80,
+		zero line,
+		legend style = {anchor = south west, at = {(0, 0)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+		legend columns = 3,
+		transpose legend,
+	]{\textwidth}{2}{position}
+	
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer \segment{A} segment,
+			axis limits = AB80 A,
+			shade overlap A = AB80
+		]
+		
+			\pgfplotsinvokeforeach{0, 6, ..., 24}{
+				\ifnum#1=18\relax
+					\addlegendimage{empty legend}
+				\fi
+				\addplot[line plot, t#1] table [x = position, y = #1] {rawData/PEV_cr_mutSens_AB80_A_lines.tsv};
+			}
+			
+			\legend{\timepoint{0}, \timepoint{6}, \timepoint{12}, ~, \timepoint{18}, \timepoint{24}}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer \segment{B} segment,
+			axis limits = AB80 B,
+			shade overlap B = AB80
+		]
+		
+			\pgfplotsinvokeforeach{0, 6, ..., 24}{
+				\addplot[line plot, t#1] table [x = position, y = #1] {rawData/PEV_cr_mutSens_AB80_B_lines.tsv};
+			}
+		
+	\end{hgroupplot}
+	
+	
+	%%% mutation sensitivity (positional mean) Cab-1
+	\coordinate[yshift = -\columnsep] (Cab-1) at (AB80 |- xlabel.south);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(Cab-1)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_mutSens_Cab-1_axes.tsv},
+		enlarge y limits = .05,
+		ytick = {-10, ..., 10},
+		ylabel = {$\log_2$(enhancer strength)},
+		title color = Cab-1,
+		zero line,
+		legend style = {anchor = south west, at = {(0, 0)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+		legend columns = 3,
+		transpose legend,
+	]{\textwidth}{2}{position}
+	
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer \segment{A} segment,
+			axis limits = Cab-1 A,
+			shade overlap A = Cab-1
+		]
+		
+			\pgfplotsinvokeforeach{0, 6, ..., 24}{
+				\ifnum#1=18\relax
+					\addlegendimage{empty legend}
+				\fi
+				\addplot[line plot, t#1] table [x = position, y = #1] {rawData/PEV_cr_mutSens_Cab-1_A_lines.tsv};
+			}
+			
+			\legend{\timepoint{0}, \timepoint{6}, \timepoint{12}, ~, \timepoint{18}, \timepoint{24}}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer \segment{B} segment,
+			axis limits = Cab-1 B,
+			shade overlap B = Cab-1
+		]
+		
+			\pgfplotsinvokeforeach{0, 6, ..., 24}{
+				\addplot[line plot, t#1] table [x = position, y = #1] {rawData/PEV_cr_mutSens_Cab-1_B_lines.tsv};
+			}
+		
+	\end{hgroupplot}
+	
+	
+	%%% mutation sensitivity (positional mean) rbcS-E9
+	\coordinate[yshift = -\columnsep] (rbcS-E9) at (AB80 |- xlabel.south);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(rbcS-E9)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_mutSens_rbcS-E9_axes.tsv},
+		enlarge y limits = .05,
+		ytick = {-10, ..., 10},
+		ylabel = {$\log_2$(enhancer strength)},
+		title color = rbcS-E9,
+		zero line,
+		legend style = {anchor = north west, at = {(0, 1)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+		legend columns = 3,
+		transpose legend,
+	]{\textwidth}{2}{position}
+	
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer \segment{A} segment,
+			axis limits = rbcS-E9 A,
+			shade overlap A = rbcS-E9
+		]
+		
+			\pgfplotsinvokeforeach{0, 6, ..., 24}{
+				\addplot[line plot, t#1] table [x = position, y = #1] {rawData/PEV_cr_mutSens_rbcS-E9_A_lines.tsv};
+			}
+			
+			\legend{\timepoint{0}, \timepoint{6}, \timepoint{12}, \timepoint{18}, \timepoint{24}}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer \segment{B} segment,
+			axis limits = rbcS-E9 B,
+			shade overlap B = rbcS-E9
+		]
+		
+			\pgfplotsinvokeforeach{0, 6, ..., 24}{
+				\addplot[line plot, t#1] table [x = position, y = #1] {rawData/PEV_cr_mutSens_rbcS-E9_B_lines.tsv};
+			}
+		
+	\end{hgroupplot}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{AB80}
+	\subfiglabel{Cab-1}
+	\subfiglabel{rbcS-E9}
+
+\end{tikzpicture}

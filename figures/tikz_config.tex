@@ -1,0 +1,311 @@
+%%% general
+\usetikzlibrary{calc, positioning, arrows.meta, arrows, bending, external, backgrounds, topaths, shapes.arrows, shapes.geometric, shapes.symbols, decorations.markings}
+
+\tikzexternalize[prefix = extFigures/, only named = true]
+
+%%% layers
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{semi foreground}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background, main, semi foreground, foreground}
+
+
+%%% colors
+\colorlet{35S promoter}{DarkSeaGreen3}
+\colorlet{35S enhancer}{DodgerBlue1}
+
+\colorlet{none}{black}
+\colorlet{35S}{35S enhancer}
+\colorlet{AB80}{OrangeRed1}
+\colorlet{Cab-1}{Chartreuse3}
+\colorlet{rbcS-E9}{DarkOrchid2}
+
+\colorlet{light}{DarkGoldenrod1}
+\colorlet{dark}{black}
+
+\definecolor{t0}{HTML}{F8766D}
+\definecolor{t6}{HTML}{A3A500}
+\definecolor{t12}{HTML}{00BF7D}
+\definecolor{t18}{HTML}{00B0F6}
+\definecolor{t24}{HTML}{E76BF3}
+
+
+%%% save and use jpeg for externalization
+\tikzset{
+	% Defines a custom style which generates BOTH, .pdf and .jpg export
+	% but prefers the .jpg on inclusion.
+	jpeg export/.style = {
+		external/system call/.add = {}{%
+			&& pdftocairo -jpeg -r #1 -singlefile "\image.pdf" "\image" %
+		},
+		/pgf/images/external info,
+		/pgf/images/include external/.code = {%
+			\includegraphics[width=\pgfexternalwidth,height=\pgfexternalheight]{##1.jpg}%
+		},
+	},
+	jpeg export/.default = 300
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%% drawing commands %%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Plant STARR-seq constructs
+% use:	\PSconstruct(*)[<barcode color>]{<coordinate (no parentheses)>}{<enhancer color>}
+\makeatletter
+	\newcommand{\PSconstruct}{%
+		\@ifstar
+			\PSconstructStar%
+			\PSconstructNoStar%
+	}
+\makeatother
+
+\newcommand{\PSconstructNoStar}[3][Orchid1]{
+	\draw[dashed, thick] (#2) -- ++(.5, 0) coordinate (c1) {};
+	
+	\draw[line width = .25cm, -Triangle Cap, #3]  (c1) ++(.1, 0) -- ++(.9, 0) coordinate (c2);
+	
+	\draw[line width = .2cm, 35S promoter] (c2) ++(.1, 0) -- ++(.4, 0) coordinate (c3);
+	\draw[-{Stealth[round]}, thick] (c3) ++(.5\pgflinewidth, 0) |- ++(.4,.3);
+	
+	\node[draw = black, thin, anchor = west] (ORF) at ($(c3) + (.4, 0)$) {~~GFP~};
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (polyA) at ($(ORF.east) + (.2, 0)$) {pA};
+	
+	\coordinate[xshift = .1cm] (c4) at (polyA.east);
+	
+	\begin{pgfonlayer} {background}
+		\fill[#1] (ORF.north west) ++(.15, 0) rectangle ($(ORF.south west) + (.05, 0)$);
+		\draw[thick] (c1) -- (ORF.west) (ORF.east) -- (polyA.west) (polyA.east) -- (c4);
+	\end{pgfonlayer}
+
+	\draw[dashed, thick] (c4) -- ++(.5, 0) coordinate (construct end);
+}
+
+\newcommand{\PSconstructStar}[3][0, 0]{
+	\draw[dashed, thick] (#2) ++(.3, 0) -- ++(.5, 0) coordinate (c1) {};
+	
+	\draw[line width = .25cm, -Triangle Cap, #3!50]  (c1) ++(.1, 0) -- ++(.6, 0) coordinate (c2);
+	
+	\draw[line width = .2cm, 35S promoter] (c2) ++(.1, 0) -- ++(.4, 0) coordinate (c3);
+	\draw[-{Stealth[round]}, thick] (c3) ++(.5\pgflinewidth, 0) |- ++(.4,.3);
+	
+	\node[draw = black, thin, anchor = west] (ORF) at ($(c3) + (.4, 0)$) {~~GFP~};
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (polyA) at ($(ORF.east) + (.2, 0)$) {pA};
+	
+	\coordinate[xshift = .1cm] (c4) at (polyA.east);
+	
+	\begin{pgfonlayer} {background}
+		\fill[#1] (ORF.north west) ++(.15, 0) rectangle ($(ORF.south west) + (.05, 0)$);
+		\draw[thick] (c1) -- (ORF.west) (ORF.east) -- (polyA.west) (polyA.east) -- (c4);
+	\end{pgfonlayer}
+
+	\draw[dashed, thick] (c4) -- ++(.5, 0) coordinate (construct end);
+}
+
+
+\pgfplotstableread{../data/sequence_files/enhancer-fragments.tsv}{\enhFragsTable}
+
+\newcommand{\PEFconstruct}[2][Orchid1]{
+	\draw[dashed, thick] (#2) -- ++(.5, 0) coordinate (c1) {};
+	
+	\draw[line width = .15cm, gray] (c1) ++(.1, 0) -- ++(.05, 0) coordinate (enh);
+	
+	\pgfmathint{random(3)}
+	
+	\foreach \n in {1, ..., \pgfmathresult}{
+		\pgfmathint{random(0, 20)}
+		\pgfplotstablegetelem{\pgfmathresult}{enhancer}\of\enhFragsTable
+		\edef\thiscolor{\pgfplotsretval}
+		\pgfplotstablegetelem{\pgfmathresult}{length}\of\enhFragsTable
+		\edef\thislength{\pgfplotsretval}
+		\pgfplotstablegetelem{\pgfmathresult}{fragment}\of\enhFragsTable
+		\edef\thisfrag{\pgfplotsretval}
+		\draw[line width = .25cm, \thiscolor!50] (enh) -- ++(.015 * \thislength, 0) node[pos = .5, text = black, node font = \figsmall\bfseries\vphantom{abcdectrl}] {\thisfrag} coordinate (enh end);
+		\draw[line width = .15cm, gray] (enh end) -- ++(.05, 0) coordinate (enh);
+	}
+	
+	\draw[line width = .2cm, 35S promoter] (enh) ++(.1, 0) -- ++(.4, 0) coordinate (c3);
+	\draw[-{Stealth[round]}, thick] (c3) ++(.5\pgflinewidth, 0) |- ++(.4,.3);
+	
+	\node[draw = black, thin, anchor = west] (ORF) at ($(c3) + (.4, 0)$) {~~GFP~};
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (polyA) at ($(ORF.east) + (.2, 0)$) {pA};
+	
+	\coordinate[xshift = .1cm] (c4) at (polyA.east);
+	
+	\begin{pgfonlayer} {background}
+		\fill[#1] (ORF.north west) ++(.15, 0) rectangle ($(ORF.south west) + (.05, 0)$);
+		\draw[thick] (c1) -- (ORF.west) (ORF.east) -- (polyA.west) (polyA.east) -- (c4);
+	\end{pgfonlayer}
+
+	\draw[dashed, thick] (c4) -- ++(.5, 0) coordinate (construct end);
+}
+
+%%% infiltrated leaf
+% use:	\leaf[<scale factor>]{<coordinate (no parentheses)>}
+% default size: 4cm x 4cm
+\newcommand{\leaf}[2][1]{%
+	\coordinate (leaf center) at (#2);
+	\begin{scope}[scale = #1, rotate = -45]
+		\useasboundingbox[rotate = -45] (leaf center) +(-2, -2) rectangle +(2, 2);
+		
+		\path (leaf center) +(-.275, 2.225) coordinate (tip);
+	
+		\path (tip) ++(-1.512, -2.036) coordinate (c1) ++(1.495, -1.482) coordinate (c2) ++(0.115, -0.077) coordinate (c3) ++(0.091, -0.648) coordinate (c4) ++(0.197, 0) coordinate (c5) ++(-0.088, 0.624) coordinate (c6) ++(0.144, 0.107) coordinate (c7) ++(1.58, 1.514) coordinate (c8);
+		
+		\filldraw[draw = Chartreuse4, fill = Chartreuse3] (c5)
+			.. controls +(-0.052, 0.182) and ($(c5) + (-0.088, 0.354)$) .. (c6)
+			.. controls +(0, 0.076) and ($(c6) + (0.028, 0.149)$) .. (c7)
+			.. controls +(0.508, -0.162) and ($(c7) + (1.957, -0.273)$) .. (c8)
+			.. controls +(-0.424, 2.007) and ($(c8) + (-1.637, 1.595)$) .. (tip)
+			.. controls +(-0.255, -0.410) and ($(tip) + (-1.446, -0.729)$) .. (c1) 
+			.. controls +(-0.064, -1.265) and ($(c1) + (0.359, -1.908)$) .. (c2)
+			.. controls +(0.057, 0.022) and ($(c2) + (0.115, 0.012)$) .. (c3)
+			.. controls +(0, -0.203) and ($(c3) + (0.025, -0.458)$) .. (c4)
+		;
+		
+		\coordinate (stem) at ($(c4)!.5!(c5)$);
+			
+		\path (stem) ++(-0.079, 0.78) coordinate (c9) ++(0.014, 0.148) coordinate (c10) ++(0.017, 0.548) coordinate (c11) ++(0, 0.15) coordinate (c12) ++(-0.036, 0.942) coordinate (c13) ++(-0.015, 0.21) coordinate (c14) ++(-0.13, 1.023) coordinate (c15);
+		
+		\draw[Chartreuse2, thin, line cap = round] (c15) .. controls +(0.071, -0.366) and ($(c15) + (0.106, -0.707)$) .. (c14);
+		\draw[Chartreuse2] (c14) .. controls +(0.005, -0.072)  and ($(c14) + (0.01, -0.142)$) .. (c13);
+		\draw[Chartreuse2] (c13) .. controls +(0.02, -0.315) and ($(c13) + (0.034, -0.632)$) .. (c12);
+		\draw[Chartreuse2, thick] (c12) .. controls +(0, -0.051) and ($(c12) + (0, -0.101)$) .. (c11);
+		\draw[Chartreuse2, thick] (c11) .. controls +(-0.002, -0.185) and ($(c11) + (-0.006, -0.378)$) .. (c10);
+		\draw[Chartreuse2, very thick] (c10) .. controls +(-0.003, -0.05) and ($(c10) + (-0.009, -0.099)$) .. (c9);
+		\draw[Chartreuse2, very thick, line cap = round] (c9) .. controls +(-0.025, -0.249) and ($(c9) + (0.013, -0.542)$) .. (stem);
+		
+		\draw[Chartreuse2, line cap = round, thick] (stem) ++(1.462, 2.097) coordinate (c16) .. controls +(-0.2, -1.143) and ($(c16) + (-1.525, -0.933)$) .. ++(-1.527, -1.169) ++(1.064, 1.937) coordinate (c17);
+		\draw[Chartreuse2, line cap = round] (c17) .. controls +(-0.312, -1.002) and ($(c17) + (-1.047, -0.998)$) .. ++(-1.047, -1.239) ++(0.4807, 1.856) coordinate (c18);
+		\draw[Chartreuse2, line cap = round, thin] (c18) .. controls +(-0.242, -0.562) and ($(c18) + (-0.544, -0.553)$) .. ++(-0.531, -0.704) ++(-0.563, 0.624) coordinate (c19);
+		\draw[Chartreuse2, line cap = round, thin] (c19) .. controls +(0.082, -0.422) and ($(c19) + (0.564, -0.624)$) .. ++(0.578, -0.834) ++(-0.975, 0.286) coordinate (c20);
+		\draw[Chartreuse2, line cap = round] (c20) .. controls +(0.019, -0.88) and ($(c20) + (1.006, -1.128)$) .. ++(1.011, -1.378) ++(-1.487, 0.529) coordinate (c21);
+		\draw[Chartreuse2, line cap = round, thick] (c21) .. controls +(0.034, -1.107) and ($(c21) + (1.484, -0.824)$) .. ++(1.456, -1.225);
+		
+		
+		\fill[Chartreuse4, opacity = .5, decoration={random steps, segment length = #1 * 0.075cm, amplitude = #1 * 0.075cm}, decorate] (tip)  ++(-0.2, -2) circle (0.8);
+		
+	\end{scope}
+}
+
+
+%%% pea pod
+% use:	\pea[<scale factor>]{<coordinate (no parentheses)>}
+% default size: 1cm x 1cm
+\newcommand{\pea}[2][1]{
+	\begin{scope}[shift = {($(#2) + (-.5 * #1, .2834 * #1)$)}, scale = .547 * #1]
+		\path[draw = black, fill = Chartreuse4, line join = round, very thin] (1.64133, -1.06530) .. controls (1.50484, -.73549) and (1.13383, -.88057) .. (.65445, -.36124) .. controls (.48949, -.18253) and (.39816, -.12003) .. (.14922, .16505) .. controls (.14008, .24513) and (.17965, .31314) .. (.19047, .33626) .. controls (.20129, .35935) and (.16246, .36982) .. (.15027, .35318) .. controls (.13809, .33654) and (.10078, .30825) .. (.09266, .19607) .. controls (.03051, .07232) and (-.04875, -.05624) .. (.05148, -.13432) .. controls (-.00844, -.24253) and (.04625, -.50120) .. (.12754, -.52249) .. controls (.06695, -.71124) and (.30070, -.93651) .. (.37570, -.91444) .. controls (.40480, -1.08382) and (.61578, -1.30385) .. (.76152, -1.20616) .. controls (.84117, -1.37628) and (1.11062, -1.37358) .. (1.13133, -1.34143) .. controls (1.23582, -1.50467) and (1.57453, -1.25952) .. (1.81715, -1.21698) .. controls (1.82456, -1.21636) and (1.86125, -1.17568) .. cycle;
+		
+		\path[draw = black, line cap = round, line join = round, very thin] (1.69902,-1.14710) .. controls (1.65699, -1.09284) and (1.47121, -1.10471) .. (1.21238, -1.05214) .. controls (.97582, -1.00405) and (.74457, -.85714) .. (.61602, -.73799) .. controls (.33668, -.47901) and (.15789, -.21350) .. (.12238, .06275) .. controls (.10871, .16404) and (.11816, .15466) .. (.17121, .08775) .. controls (.39191, -.19065) and (.66066, -.46753) .. (.88508, -.64229) .. controls (1.13840, -.83956) and (1.47039, -.84413) .. (1.59676, -1.05991);
+		
+		\path[draw = black, fill = Chartreuse2, very thin] (.12691, .03286) .. controls (.14422, -.07124) and (.18172, -.17382) .. (.23719, -.27510) .. controls (.35104, -.27747) and (.44564, -.16291) .. (.40254, -.04237) .. controls (.36174, .07192) and (.21888, .11122) .. (.12691, .03286) -- cycle;
+		
+		\path[draw = black, fill = Chartreuse2, very thin] (.21379, -.23007) .. controls (.26512, -.33425) and (.33562, -.43702) .. (.42285, -.53866) .. controls (.53415, -.51721) and (.63570, -.39831) .. (.58934, -.26858) .. controls (.53325, -.11172) and (.31238, -.09543) .. (.21379, -.23007) -- cycle;
+		
+		\path[draw = black, fill = Chartreuse2, very thin] (.39465, -.50503) .. controls (.42419, -.54108) and (.56460, -.70820) .. (.71621, -.82022) .. controls (.88242, -.73974) and (.89641, -.51663) .. (.75585, -.41383) .. controls (.63335, -.32424) and (.45921, -.37011) .. (.39465, -.50503) -- cycle;
+		
+		\path[draw = black, fill = Chartreuse2, very thin] (.60930, -.73167) .. controls (.64250, -.76323) and (.78804, -.89433) .. (1.00750, -.98721) .. controls (1.12937, -.87645) and (1.10961, -.68930) .. (.97408, -.60984) .. controls (.84271, -.53283) and (.66773, -.59239) .. (.60930, -.73167) -- cycle;
+		
+		\path[draw = black, fill = Chartreuse2, very thin] (.86129, -.91456) .. controls (1.06227, -1.02913) and (1.20794, -1.05346) .. (1.30973, -1.06967) .. controls (1.35277, -.96335) and (1.30637, -.83909) .. (1.20156, -.77995) .. controls (1.06515, -.70314) and (.89673, -.77134) .. (.86129, -.91456) -- cycle;
+		
+		\path[draw = black, fill = Chartreuse2, very thin] (1.20465, -1.05046) .. controls (1.38008, -1.08718) and (1.53193, -1.09354) .. (1.61988, -1.11167) .. controls (1.60806, -1.04567) and (1.56715, -.97220) .. (1.49355, -.93198) .. controls (1.37850, -.86910) and (1.24451, -.92324) .. (1.20465, -1.05046) -- cycle;
+		
+		\path[draw = black, line cap = round, line join = round, very thin] (1.09938, -1.19639) .. controls (1.10091, -1.55882) and (1.43296, -1.33730) .. (1.71002, -1.24524)(.74102, -1.06917) .. controls (.71219, -1.37608) and (1.10613, -1.38057) .. (1.13129, -1.34143)(.41137, -.77948) .. controls (.26355, -.91108) and (.56926, -1.33507) .. (.76152, -1.20616)(.18801, -.42905) .. controls (-.01895, -.62565) and (.28770, -.94034) .. (.37570, -.91452)(.08121, -.10030) .. controls (-.02230, -.17061) and (.03559, -.49842) .. (.12754, -.52249);
+	\end{scope}
+}
+
+
+%%% wheat ears
+% use:	\wheat[<scale factor>]{<coordinate (no parentheses)>}
+% default size: 1cm x 1cm
+\newcommand{\wheat}[2][1]{
+	\begin{scope}[shift = {($(#2) + (-.468486 * #1, .23621 * #1)$)}, scale = .2648 * #1]
+		\path[draw = DarkGoldenrod4!50!black, fill = Goldenrod2, line join = round, very thin] (3.5026, -2.3344) .. controls (2.5296, -2.4228) and (2.2226, -1.1610) .. (2.0018, -0.2584) .. controls (2.1170, -1.2034) and (2.5064, -2.5332) .. (3.5381, -2.4212) -- cycle;
+		
+		\path[draw = DarkGoldenrod4!50!black, fill = Gold2, line join = round, very thin]
+			(1.9563, -1.9194) .. controls (2.1187, -2.1561) and (2.4252, -2.2377) .. (2.6805, -2.1236) .. controls (2.5187, -1.8875) and (2.2125, -1.8050) .. cycle
+			(1.7596, -1.4931) .. controls (1.8824, -1.7529) and (2.1725, -1.8816) .. (2.4422, -1.8096) .. controls (2.3194, -1.5498) and (2.0293, -1.4211) .. cycle
+			(1.6360, -1.0376) .. controls (1.7179, -1.3125) and (1.9844, -1.4843) .. (2.2628, -1.4540) .. controls (2.1810, -1.1797) and (1.9148, -1.0073) .. cycle
+			(1.5570, -0.5496) .. controls (1.6058, -0.8322) and (1.8506, -1.0344) .. (2.1302, -1.0370) .. controls (2.0814, -0.7544) and (1.8368, -0.5523) .. cycle
+			(1.5493, -0.0767) .. controls (1.5497, -0.3633) and (1.7564, -0.6039) .. (2.0320, -0.6539) .. controls (2.0315, -0.3673) and (1.8251, -0.1267) .. cycle
+			(1.6028, 0.4259) .. controls (1.5589, 0.1425) and (1.7262, -0.1272) .. (1.9904, -0.2190) .. controls (2.0344, 0.0647) and (1.8668, 0.3342) .. cycle
+			(2.6720, -1.1997) .. controls (2.4919, -1.4232) and (2.5016, -1.7402) .. (2.6844, -1.9520) .. controls (2.8643, -1.7287) and (2.8548, -1.4117) .. cycle
+			(2.5583, -0.7359) .. controls (2.3358, -0.9170) and (2.2792, -1.2291) .. (2.4139, -1.4744) .. controls (2.6363, -1.2935) and (2.6929, -0.9813) .. cycle
+			(2.3974, -0.2748) .. controls (2.1723, -0.4523) and (2.1108, -0.7636) .. (2.2419, -1.0110) .. controls (2.4667, -0.8336) and (2.5285, -0.5227) .. cycle
+			(2.3066, 0.1865) .. controls (2.0681, 0.0273) and (1.9825, -0.2782) .. (2.0936, -0.5351) .. controls (2.3321, -0.3758) and (2.4176, -0.0702) .. cycle
+			(2.3027, 0.6979) .. controls (2.0530, 0.5571) and (1.9446, 0.2588) .. (2.0361, -0.0057) .. controls (2.2858, 0.1353) and (2.3942, 0.4335) .. cycle
+			(1.8764, 0.9961) .. controls (1.7075, 0.7642) and (1.7323, 0.4481) .. (1.9252, 0.2451) .. controls (2.0941, 0.4770) and (2.0692, 0.7932) .. cycle;
+		
+		\path[draw = DarkGoldenrod4!50!black, fill = Goldenrod2, line join = round, very thin] (3.2539, -2.1854) .. controls (2.5102, -2.8189) and (1.5314, -1.9655) .. (0.8303, -1.3557) .. controls (1.4696, -2.0611) and (2.5549, -2.9225) .. (3.3329, -2.2358) -- cycle;
+		
+		\path[draw = DarkGoldenrod4!50!black, fill = Gold2, line join = round, very thin]
+			(0.0033, -0.4040) .. controls (-0.0007, -0.6903) and (0.2019, -0.9343) .. (0.4771, -0.9887) .. controls (0.4811, -0.7012) and (0.2772, -0.4580) .. cycle
+			(1.7515, -2.7386) .. controls (2.0201, -2.8380) and (2.3179, -2.7284) .. (2.4608, -2.4875) .. controls (2.1918, -2.3878) and (1.8940, -2.4981) .. cycle
+			(1.3449, -2.5040) .. controls (1.5944, -2.6447) and (1.9054, -2.5838) .. (2.0850, -2.3685) .. controls (1.8353, -2.2275) and (1.5240, -2.2889) .. cycle
+			(0.9812, -2.2033) .. controls (1.2069, -2.3807) and (1.5241, -2.3667) .. (1.7332, -2.1817) .. controls (1.5078, -2.0045) and (1.1911, -2.0178) .. cycle
+			(0.6350, -1.8502) .. controls (0.8381, -2.0529) and (1.1545, -2.0767) .. (1.3844, -1.9176) .. controls (1.1815, -1.7150) and (0.8651, -1.6909) .. cycle
+			(0.3558, -1.4684) .. controls (0.5214, -1.7019) and (0.8289, -1.7797) .. (1.0832, -1.6613) .. controls (0.9171, -1.4271) and (0.6092, -1.3505) .. cycle
+			(0.1096, -1.0271) .. controls (0.2372, -1.2837) and (0.5292, -1.4076) .. (0.7983, -1.3300) .. controls (0.6706, -1.0735) and (0.3787, -0.9495) .. cycle
+			(1.9208, -1.7379) .. controls (1.9026, -2.0233) and (2.0927, -2.2772) .. (2.3650, -2.3452) .. controls (2.3831, -2.0590) and (2.1923, -1.8055) .. cycle
+			(1.5604, -1.4246) .. controls (1.4828, -1.7015) and (1.6176, -1.9888) .. (1.8685, -2.1111) .. controls (1.9456, -1.8351) and (1.8122, -1.5477) .. cycle
+			(1.1628, -1.1409) .. controls (1.0815, -1.4157) and (1.2109, -1.7053) .. (1.4606, -1.8319) .. controls (1.5420, -1.5576) and (1.4130, -1.2676) .. cycle
+			(0.8224, -0.8165) .. controls (0.7197, -1.0841) and (0.8259, -1.3830) .. (1.0649, -1.5288) .. controls (1.1677, -1.2614) and (1.0616, -0.9624) .. cycle
+			(0.5243, -0.4010) .. controls (0.4017, -0.6597) and (0.4847, -0.9658) .. (0.7124, -1.1296) .. controls (0.8354, -0.8698) and (0.7510, -0.5638) .. cycle;
+	\end{scope}
+}
+
+%%% Arabidopsis
+% use:	\arabidopsis[<scale factor>]{<coordinate (no parentheses)>}
+% default size: 2cm x 2cm
+\newcommand{\arabidopsis}[2][1]{
+	\begin{scope}[shift = {($(#2) + (-.901 * #1, .929 * #1)$)}, scale = .696 * #1]
+		\fill[white] (1.110976, -.7490396) .. controls (1.059388, -.7421765) and (1.06516, -.6995117) .. (1.090398, -.7049062) .. controls (1.094612, -.6646722) and (1.140522, -.6731404) .. (1.139822, -.6900455) .. controls (1.161616, -.6755084) and (1.179327, -.7053998) .. (1.137018, -.7378842) -- cycle;
+		\fill[white] (1.516505, -.2226796) .. controls (1.532256, -.1671951) and (1.569578, -.1908112) .. (1.558339, -.2140427) .. controls (1.585799, -.220477) and (1.583996, -.2564119) .. (1.56507, -.2595871) .. controls (1.574659, -.2856564) and (1.518744, -.2955267) .. (1.521593, -.258699) -- cycle;
+		\fill[white] (1.497206, 0.03760345) .. controls (1.512569, .1178339) and (1.570914, 0.09925079) .. (1.561346, 0.06547394) .. controls (1.597664, 0.08219116) and (1.6078, 0.04001312) .. (1.58766, 0.02977478) .. controls (1.634637, 0.01435913) and (1.561761, -0.04352264) .. (1.518353, 0.00133087) -- cycle;
+		\fill[white] (1.436943, 0.01749329) .. controls (1.40656, 0.00903809) and (1.392565, 0.04726685) .. (1.418312, 0.04548859) .. controls (1.406998, 0.07590271) and (1.443938, 0.09044678) .. (1.455336, 0.05982086) .. controls (1.454122, 0.08362213) and (1.500802, 0.06858459) .. (1.465237, 0.03310974) -- cycle;
+		\draw[black, line width = #1 * 0.1pt, line cap = round] (1.110976, -.7490396) .. controls (1.059388, -.7421765) and (1.06516, -.6995117) .. (1.090398, -.7049062) (1.129261, -.7287445) .. controls (1.125241, -.7125012) and (1.127808, -.6989293) .. (1.139822, -.6900455) .. controls (1.161616, -.6755084) and (1.179327, -.7053998) .. (1.137018, -.7378844) (1.111843, -.7332196) .. controls (1.100274, -.726212) and (1.089398, -.7152493) .. (1.090398, -.7049063) .. controls (1.094612, -.6646724) and (1.140522, -.6731406) .. (1.139822, -.6900455);
+		\draw[black, line width = #1 * 0.1pt, line cap = round] (1.418312, 0.04548859) .. controls (1.406998, 0.07590271) and (1.443938, 0.09044678) .. (1.455336, 0.05982086) .. controls (1.454122, 0.08362213) and (1.500802, 0.06858459) .. (1.465237, 0.03310974) (1.436943, 0.01749329) .. controls (1.40656, 0.00903809) and (1.392565, 0.04726685) .. (1.418312, 0.04548859) .. controls (1.424161, 0.04474426) and (1.427797, 0.03803925) .. (1.430103, 0.03448517) (1.418312, 0.04548859) .. controls (1.406998, 0.07590271) and (1.443938, 0.09044678) .. (1.455336, 0.05982086) .. controls (1.457083, 0.05492767) and (1.457702, 0.04872772) .. (1.457172, 0.04489319);
+		\draw[black, line width = #1 * 0.1pt, line cap = round] (1.548882, 0.01051208) .. controls (1.561193, 0.02702515) and (1.576233, 0.0333728) .. (1.58766, 0.02977478) .. controls (1.634637, 0.01435913) and (1.561761, -0.04352264) .. (1.518353, 0.00133087) (1.561346, 0.06547394) .. controls (1.597664, 0.08219116) and (1.6078, 0.04001312) .. (1.58766, 0.02977478) (1.497206, 0.03760345) .. controls (1.512569, .1178339) and (1.570914, 0.09925079) .. (1.561346, 0.06547394) .. controls (1.55772, 0.05133911) and (1.550039, 0.03949677) .. (1.526977, 0.03753906);
+		\draw[black, line width = #1 * 0.1pt, line cap = round] (1.516505, -.2226796) .. controls (1.532256, -.1671951) and (1.569578, -.1908112) .. (1.558339, -.2140427) .. controls (1.585799, -.220477) and (1.583996, -.2564119) .. (1.56507, -.2595871) .. controls (1.574659, -.2856564) and (1.518744, -.2955267) .. (1.521593, -.258699) (1.558339, -.2140427) .. controls (1.585799, -.220477) and (1.583996, -.2564119) .. (1.56507, -.2595871) .. controls (1.555155, -.2609512) and (1.548795, -.2583966) .. (1.541025, -.2528477) (1.516505, -.2226796) .. controls (1.532256, -.1671951) and (1.569578, -.1908112) .. (1.558339, -.2140427) .. controls (1.553725, -.2223553) and (1.5473, -.2299008) .. (1.537186, -.2301865);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.260802, -1.65163) .. controls (1.252702, -1.480435) and (1.191644, -1.440478) .. (1.1176, -1.357702) .. controls (1.091667, -1.328711) and (1.103697, -1.291315) .. (1.079069, -1.257097) .. controls (1.054261, -1.222629) and (1.074713, -1.205013) .. (1.064732, -1.171028) .. controls (1.03889, -1.08303) and (1.090716, -1.026298) .. (1.12365, -1.018192) .. controls (1.238643, -.9898877) and (1.299704, -1.226189) .. (1.282453, -1.368344) .. controls (1.271076, -1.462095) and (1.289273, -1.394524) .. (1.281664, -1.634375);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round]	(1.267139, -1.630478) .. controls (1.279164, -1.400917) and (1.175734, -1.352484) .. (1.150742, -1.09394);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.257073, -1.613271) .. controls (1.451349, -1.077845) and (1.454698, -1.134954) .. (1.274401, -.9786447) .. controls (1.257414, -.9639175) and (1.264737, -.9443961) .. (1.262147, -.9079227) .. controls (1.257073, -.836456) and (1.420537, -.7034793) .. (1.497307, -.7365228) .. controls (1.606083, -.7833429) and (1.795836, -.9226257) .. (1.57517, -1.080421) .. controls (1.415191, -1.194819) and (1.469509, -1.280213) .. (1.289362, -1.599571);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.483121, -.8405951) .. controls (1.497032, -1.209887) and (1.358083, -1.30055) .. (1.274401, -1.644367);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.289362, -1.599571) .. controls (1.458887, -1.47267) and (1.620601, -1.449775) .. (1.563134, -1.352484) .. controls (1.508087, -1.259292) and (1.652702, -1.27478) .. (1.707603, -1.295272) .. controls (1.760986, -1.315199) and (1.789353, -1.299651) .. (1.807231, -1.316943) .. controls (1.989878, -1.493602) and (1.718136, -1.520414) .. (1.661592, -1.457041) .. controls (1.633508, -1.425565) and (1.526314, -1.476194) .. (1.306812, -1.620024);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.747994, -1.364964) .. controls (1.686613, -1.374907) and (1.374055, -1.543023) .. (1.281664, -1.634375);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.260802, -1.65163) .. controls (1.306902, -1.466121) and (1.465397, -1.351467) .. (1.45448, -1.293419) .. controls (1.443801, -1.236643) and (1.505927, -1.188484) .. (1.516539, -1.120541) .. controls (1.536722, -.9913243) and (1.909822, -.7345792) .. (2.015351, -.857966) .. controls (2.13048, -.9925774) and (1.870889, -1.225336) .. (1.822996, -1.220363) .. controls (1.757843, -1.213598) and (1.747973, -1.250014) .. (1.740287, -1.264849) .. controls (1.721344, -1.301416) and (1.546288, -1.224848) .. (1.306812, -1.620024);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.83517, -.9151849) .. controls (1.593072, -1.241134) and (1.313334, -1.493684) .. (1.281664, -1.634375);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.059839, -1.39177) .. controls (.8660852, -1.161855) and (.9119225, -1.142813) .. (.7467854, -1.070244) .. controls (.6747658, -1.038596) and (.6873651, -1.009138) .. (.6157742, -.9597348) .. controls (.4563691, -.8497337) and (.3192791, -.5931989) .. (.3987961, -.5698506) .. controls (.5415633, -.5279306) and (.5556416, -.6061438) .. (.6570277, -.682739) .. controls (.7109188, -.7234526) and (.7943625, -.8114293) .. (.8311678, -.8861511) .. controls (.8644155, -.9536507) and (.9227099, -1.007779) .. (.9256161, -1.032485) .. controls (.9447453, -1.195104) and (1.001012, -1.181425) .. (1.150742, -1.426253);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.110338, -1.401564) .. controls (.7178429, -.9009685) and (.5840659, -.6409457) .. (.5168233, -.6260461);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.212983, -1.66448) .. controls (1.128811, -1.648619) and (.9914369, -1.639774) .. (.8671743, -1.60557) .. controls (.7066595, -1.561388) and (.567846, -1.541183) .. (.5390547, -1.585572) .. controls (.4807458, -1.675469) and (.4048689, -1.690349) .. (.3602141, -1.695491) .. controls (.1792303, -1.716333) and (0.03555548, -1.567241) .. (0.03629992, -1.489242) .. controls (0.03763966, -1.348873) and (.4340899, -1.334304) .. (.506601, -1.378525) .. controls (.6591374, -1.471549) and (.7797838, -1.572827) .. (1.158642, -1.624502);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.24544, -1.659935) .. controls (1.215259, -1.636665) and (1.010394, -1.635278) .. (.8360976, -1.57254) .. controls (.6305917, -1.498569) and (.379686, -1.492437) .. (.2470609, -1.505955);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.212983, -1.66448) .. controls (1.141422, -1.611898) and (1.061812, -1.550873) .. (.9890236, -1.519809) .. controls (.9714784, -1.512321) and (.930235, -1.559643) .. (.9154265, -1.541404) .. controls (.8945015, -1.515631) and (.8544054, -1.5341) .. (.8507917, -1.532798) .. controls (.8284225, -1.524738) and (.8587304, -1.510681) .. (.7436899, -1.483481) .. controls (.6169164, -1.453508) and (.3003641, -1.413666) .. (.3610103, -1.326288) .. controls (.4904286, -1.139825) and (.8754481, -1.356553) .. (.947956, -1.400779) .. controls (1.042372, -1.458368) and (.9522707, -1.425929) .. (1.128074, -1.552754);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.215259, -1.636665) .. controls (.9978675, -1.482232) and (.8968261, -1.391116) .. (.5706844, -1.324205);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.899221, -1.585572) .. controls (2.028201, -1.511157) and (1.919623, -1.471103) .. (2.260023, -1.51714) .. controls (2.42255, -1.539121) and (2.756279, -1.712312) .. (2.718552, -1.804291) .. controls (2.691785, -1.86955) and (2.685695, -1.894108) .. (2.297149, -1.848499) .. controls (2.270155, -1.845331) and (2.268071, -1.824809) .. (2.2437, -1.814969) .. controls (2.229655, -1.809298) and (2.195565, -1.821826) .. (2.174404, -1.805122) .. controls (2.087753, -1.736722) and (1.953629, -1.644367) .. (1.886529, -1.64242);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (2.481512, -1.64242) .. controls (2.393123, -1.621897) and (2.033024, -1.577676) .. (1.937092, -1.607863);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.260802, -1.65163) .. controls (1.322766, -1.598464) and (1.351099, -1.586127) .. (1.59872, -1.489175) .. controls (1.70599, -1.447175) and (1.908458, -1.425225) .. (1.990233, -1.585083) .. controls (2.023482, -1.650079) and (1.99824, -1.705139) .. (1.650557, -1.695491) .. controls (1.471962, -1.690535) and (1.409731, -1.598754) .. (1.301233, -1.65928);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.788574, -1.501598) .. controls (1.655662, -1.49362) and (1.551567, -1.562188) .. (1.464878, -1.572967) .. controls (1.37123, -1.584611) and (1.293361, -1.63106) .. (1.26941, -1.670197);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.212983, -1.66448) .. controls (1.143732, -1.540031) and (1.022274, -1.478925) .. (1.034623, -1.404825) .. controls (1.042691, -1.356416) and (1.314234, -1.443328) .. (1.260803, -1.65163);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.24544, -1.695491) .. controls (1.23669, -1.518158) and (1.150742, -1.519989) .. (1.082413, -1.437705);
+		\filldraw[Green4, draw = Green4!25!black, line width = #1 * 0.1pt] (1.313275, -.4124908) .. controls (1.379494, -.2955698) and (1.505575, -.308222) .. (1.512805, -.3482965) .. controls (1.527054, -.427265) and (1.3549, -.3991324) .. (1.30592, -.4367551);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.3pt, line cap = round] (1.309138, -.4215445) .. controls (1.32873, -.40599) and (1.396374, -.3604324) .. (1.472182, -.3580121);
+		\filldraw[Green4, draw = Green4!25!black, line width = #1 * 0.1pt] (1.289641, -.4302139) .. controls (1.225633, -.3151486) and (1.104749, -.3562045) .. (1.150111, -.2730673) .. controls (1.192384, -.1955902) and (1.297454, -.3393903) .. (1.293926, -.4092657);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.3pt, line cap = round] (1.180296, -.294657) .. controls (1.196421, -.2848813) and (1.270843, -.3604895) .. (1.292616, -.4155617);
+		\filldraw[Green4, draw = Green4!25!black, line width = #1 * 0.1pt] (1.425318, -0.0920694) .. controls (1.444892, -0.04842621) and (1.492004, -0.046474) .. (1.492889, -0.06289307) .. controls (1.494425, -0.09138336) and (1.472398, -0.09816925) .. (1.419542, -.101889);
+		\filldraw[Green4, draw = Green4!25!black, line width = #1 * 0.15pt] (1.237375, -1.709747) .. controls (.8686243, -1.839455) and (.6684191, -1.850224) .. (.5996783, -2.128251) .. controls (.5773847, -2.218419) and (.4769325, -2.231359) .. (.4478499, -2.285979) .. controls (.388618, -2.397223) and (.3040061, -2.415909) .. (.1629469, -2.422675) .. controls (0.05425596, -2.427888) and (-.09978406, -2.42783) .. (-.1143554, -2.407839) .. controls (-.1665305, -2.336259) and (-.1432023, -2.014742) .. (.3181223, -1.871277) .. controls (.6899586, -1.755642) and (.523928, -1.909868) .. (.8051375, -1.791136) .. controls (.9724944, -1.720474) and (1.197205, -1.662085) .. (1.24544, -1.659935);
+		\filldraw[Green4, draw = Green4!25!black, line width = #1 * 0.1pt] (1.226325, -.9933966) .. controls (1.17401, -.9590718) and (.8519284, -1.018405) .. (.8712038, -.9149969) .. controls (.8929716, -.7982172) and (1.157684, -.8687085) .. (1.219093, -.9686751);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.3pt, line cap = round] (.9389383, -.9178856) .. controls (1.049261, -.9433618) and (1.092403, -.9060446) .. (1.222533, -.9796097);
+		\filldraw[Green4, draw = Green4!25!black, line width = #1 * 0.1pt] (1.24544, -1.659935) .. controls (1.223125, -1.55415) and (1.211655, -1.289246) .. (1.226325, -.9933966) .. controls (1.22655, -.988876) and (1.175696, -.8292197) .. (1.137576, -.7771216) .. controls (1.135419, -.7741731) and (1.115179, -.7717822) .. (1.110976, -.7490396) .. controls (1.109699, -.7421284) and (1.134517, -.7347879) .. (1.137018, -.7378844) .. controls (1.14891, -.7526132) and (1.143283, -.7628717) .. (1.146008, -.766196) .. controls (1.198115, -.8297755) and (1.228403, -.9559714) .. (1.22873, -.9501501) .. controls (1.248771, -.5928473) and (1.306514, -.2115433) .. (1.426494, -0.05867249) .. controls (1.43056, -0.05349274) and (1.439863, -0.00869873) .. (1.444617, 0.0025119) .. controls (1.444855, 0.00307312) and (1.43773, 0.00764954) .. (1.436943, 0.01749329) .. controls (1.436425, 0.0239679) and (1.46399, 0.03710449) .. (1.465237, 0.03310974) .. controls (1.471722, 0.01233826) and (1.458201, 0.00470825) .. (1.457364, 0.00170136) .. controls (1.454663, -0.00800415) and (1.446422, -0.03197693) .. (1.448757, -0.02911621) .. controls (1.45763, -0.01824585) and (1.466809, -0.00804169) .. (1.476302, 0.00145142) .. controls (1.481416, 0.00656555) and (1.473293, 0.02633392) .. (1.497207, 0.03760345) .. controls (1.509271, 0.04328888) and (1.526673, 0.00691986) .. (1.518354, 0.00133057) .. controls (1.504202, -0.00817688) and (1.499005, -0.00235596) .. (1.491119, -0.00946045) .. controls (1.415642, -0.0774585) and (1.360388, -.2086484) .. (1.321188, -.3690387) .. controls (1.319473, -.3760574) and (1.379332, -.279348) .. (1.484626, -.2389552) .. controls (1.49042, -.2367325) and (1.490185, -.224389) .. (1.516505, -.2226796) .. controls (1.524115, -.2221854) and (1.529831, -.2564153) .. (1.521593, -.258699) .. controls (1.500187, -.2646336) and (1.49176, -.2523102) .. (1.49127, -.252475) .. controls (1.376579, -.2910558) and (1.310965, -.4130669) .. (1.309139, -.4215446) .. controls (1.215139, -.8579851) and (1.228697, -1.470561) .. (1.274402, -1.644367);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.237375, -1.67746) .. controls (.707674, -1.819383) and (.6752964, -1.901088) .. (.3569763, -2.065095);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.242588, -1.770743) .. controls (1.018009, -2.019354) and (1.185388, -1.876744) .. (1.174349, -2.126797) .. controls (1.166429, -2.306182) and (.9223582, -2.302882) .. (.8859967, -2.251906) .. controls (.8172271, -2.155494) and (.8728653, -2.011261) .. (.9441631, -1.96511) .. controls (1.094147, -1.868024) and (1.02482, -2.016552) .. (1.235724, -1.697611);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.275191, -1.704479) .. controls (.9988309, -1.99817) and (1.04323, -2.079486) .. (.9638289, -2.18092);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.301233, -1.65928) .. controls (2.04463, -1.981619) and (1.891531, -1.721116) .. (2.032323, -1.753348) .. controls (2.093732, -1.767406) and (2.188408, -1.880858) .. (2.312403, -1.924456) .. controls (2.638488, -2.039112) and (2.589329, -2.165254) .. (2.519076, -2.252216) .. controls (2.43377, -2.357812) and (2.018468, -2.357669) .. (1.901249, -2.118594) .. controls (1.822595, -1.958175) and (1.665798, -1.849493) .. (1.307997, -1.714651);
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.299704, -1.684722) .. controls (1.824951, -1.931137) and (1.810116, -1.768883) .. (2.268672, -2.057832);
+		\filldraw[Green4, draw = Green4!50!black, line width = #1 * 0.15pt] (1.301233, -1.65928) .. controls (1.341332, -2.075482) and (1.550518, -1.941286) .. (1.506694, -2.322522) .. controls (1.497513, -2.402393) and (1.434476, -2.516491) .. (1.407827, -2.595714) .. controls (1.386474, -2.659193) and (1.289363, -2.777413) .. (1.19791, -2.763916) .. controls (1.068081, -2.744754) and (1.036797, -2.571601) .. (1.009442, -2.532555) .. controls (.9668889, -2.471815) and (.9704975, -2.252596) .. (1.031327, -2.104443) .. controls (1.099186, -1.939168) and (1.280252, -1.985923) .. (1.235724, -1.697611) .. controls (1.224776, -1.652777) and (1.296776, -1.630253) .. (1.301233, -1.65928) ;
+		\draw[Chartreuse3!50!Chartreuse4, line width = #1 * 0.4pt, line cap = round] (1.260802, -1.65163) .. controls (1.309579, -1.724783) and (1.269409, -2.351198) .. (1.192651, -2.651588);
+	\end{scope}
+}

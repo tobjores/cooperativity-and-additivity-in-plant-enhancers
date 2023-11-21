@@ -1,0 +1,107 @@
+\begin{tikzpicture}
+
+	\coordinate (frags) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt, font = \hphantom{A}] (ptitle) at (frags) {\vphantom{\light}};
+	
+	\distance{ptitle.south}{ptitle.north}
+	
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(frags)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEF_fragments_axes.tsv},
+		enlarge y limits = .05,
+		zero line,
+		xticklabel style = {font = \vphantom{abcde}}
+	]{\textwidth - \ydistance}{7cm + \plotxlabelheight + \groupplotsep}{5}{2}{fragments}{$\log_2$(enhancer strength)}
+		
+		\nextgroupplot[
+			title = \enhancer{AB80} fragment \textbf{bc},
+			title color = AB80,
+			x tick table = {rawData/PEF_fragments_AB80_bc_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{AB80, mark options = {AB80!50}}{rawData/PEF_fragments_AB80_bc_light};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1} fragment \textbf{bc},
+			title color = Cab-1,
+			x tick table = {rawData/PEF_fragments_Cab-1_bc_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{Cab-1, mark options = {Cab-1!50}}{rawData/PEF_fragments_Cab-1_bc_light};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1} fragment \textbf{de},
+			title color = Cab-1,
+			x tick table = {rawData/PEF_fragments_Cab-1_de_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{Cab-1, mark options = {Cab-1!50}}{rawData/PEF_fragments_Cab-1_de_light};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} fragment \textbf{ab},
+			title color = rbcS-E9,
+			x tick table = {rawData/PEF_fragments_rbcS-E9_ab_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{rbcS-E9, mark options = {rbcS-E9!50}}{rawData/PEF_fragments_rbcS-E9_ab_light};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} fragment \textbf{de},
+			title color = rbcS-E9,
+			x tick table = {rawData/PEF_fragments_rbcS-E9_de_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{rbcS-E9, mark options = {rbcS-E9!50}}{rawData/PEF_fragments_rbcS-E9_de_light};
+			
+		
+		\nextgroupplot[
+			x tick table = {rawData/PEF_fragments_AB80_bc_dark_mean.tsv}{construct},
+		]
+		
+			\hmandp{AB80, mark options = {AB80!50}}{rawData/PEF_fragments_AB80_bc_dark};
+			
+			
+		\nextgroupplot[
+			x tick table = {rawData/PEF_fragments_Cab-1_bc_dark_mean.tsv}{construct},
+		]
+		
+			\hmandp{Cab-1, mark options = {Cab-1!50}}{rawData/PEF_fragments_Cab-1_bc_dark};
+			
+			
+		\nextgroupplot[
+			x tick table = {rawData/PEF_fragments_Cab-1_de_dark_mean.tsv}{construct},
+		]
+		
+			\hmandp{Cab-1, mark options = {Cab-1!50}}{rawData/PEF_fragments_Cab-1_de_dark};
+			
+			
+		\nextgroupplot[
+			x tick table = {rawData/PEF_fragments_rbcS-E9_ab_dark_mean.tsv}{construct},
+		]
+		
+			\hmandp{rbcS-E9, mark options = {rbcS-E9!50}}{rawData/PEF_fragments_rbcS-E9_ab_dark};
+			
+			
+		\nextgroupplot[
+			x tick table = {rawData/PEF_fragments_rbcS-E9_de_dark_mean.tsv}{construct},
+		]
+		
+			\hmandp{rbcS-E9, mark options = {rbcS-E9!50}}{rawData/PEF_fragments_rbcS-E9_de_dark};
+		
+	\end{hvgroupplot}
+	
+	\distance{group c5r1.south}{group c5r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c5r1.north east) {\light};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tdark) at (group c5r2.north east) {\dark};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{frags}
+
+\end{tikzpicture}

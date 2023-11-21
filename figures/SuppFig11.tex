@@ -1,0 +1,220 @@
+\begin{tikzpicture}
+	\addtolength{\plotylabelwidth}{.5\baselineskip}
+	\setlength{\plotheight}{16.75cm}
+
+	%%% heatmap rbcS-E9 (circadian rhythm)
+	\coordinate (rbcS-E9) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt] (ptitle) at (rbcS-E9) {\vphantom{\enhancer{rbcS-E9} enhancer \segment{A} segment}};
+	
+	\distance{ptitle.south}{ptitle.north}
+
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(rbcS-E9)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_heatmap_rbcS-E9_axes.tsv},
+		xtick = {1, 20, 40, ..., 300},
+		title color = rbcS-E9,
+		heatmap,
+	]{\textwidth - \ydistance}{\plotheight}{2}{10}{position}{}
+		
+		% timepoint 0
+		\nextgroupplot [
+			title = \enhancer{rbcS-E9} enhancer \segment{A} segment,
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_A_0_ins.tsv}
+			
+			
+		\nextgroupplot [
+			title = \enhancer{rbcS-E9} enhancer \segment{B} segment,
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_B_0_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_A_0_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_B_0_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_wt.tsv}
+			
+			
+		% timepoint 6
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_A_6_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_B_6_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_A_6_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_B_6_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_wt.tsv}
+			
+			
+		% timepoint 12
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_A_12_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_B_12_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_A_12_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_B_12_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_wt.tsv}
+			
+			
+		% timepoint 18
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_A_18_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_B_18_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_A_18_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_B_18_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_wt.tsv}
+			
+			
+		% timepoint 24
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_A_24_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_cr_heatmap_rbcS-E9_B_24_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_A_24_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight,
+			colorbar heatmap
+		]
+		
+			\heatmapSubDel{rawData/PEV_cr_heatmap_rbcS-E9_B_24_sub+del.tsv}
+			\heatmapWT{rawData/PEV_cr_heatmap_rbcS-E9_wt.tsv}
+
+	\end{hvgroupplot}
+	
+	\distance{group c2r2.south}{group c2r1.north}
+	
+	\foreach \cond [count = \i] in {0, 6, 12, 18, 24}{
+		\pgfmathint{2 * \i - 1}
+		\node[anchor = south west, rotate = -90, draw = black, fill = t\cond!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r\pgfmathresult.north east) {\timepoint{\cond}};
+	}
+
+
+	%%% subfigure labels
+	\subfiglabel{rbcS-E9}
+
+\end{tikzpicture}

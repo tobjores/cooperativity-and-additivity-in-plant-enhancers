@@ -1,0 +1,249 @@
+\begin{tikzpicture}
+	\pgfplotsset{
+		every axis/.append style = {
+			height = 2.75cm
+		}
+	}
+	\addtolength{\plotylabelwidth}{\baselineskip}
+
+	%%% rep correlation PEfl
+	\coordinate (PEfl reps) at (0, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(PEfl reps)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEfl_cor_reps_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		legend style = {anchor = south east, at = {(1, 0)}},
+		legend image post style = {fill opacity = 1, mark size = 1.25},
+		legend plot pos = right,
+		legend cell align = right,
+		scatter/classes = {
+			none={black},
+			35S={35S enhancer},
+			AB80={AB80},
+			Cab-1={Cab-1},
+			rbcS-E9={rbcS-E9}
+		},
+		show diagonal,
+		ylabel = {\textbf{replicate 2}:\\$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{\textbf{replicate 1}: $\log_2$(enhancer strength)}
+	
+		\nextgroupplot[
+			title = \light,
+			title color = light
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = rep1, y = rep2, meta = enhancer] {rawData/PEfl_cor_reps_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEfl_cor_reps_light}
+			
+			
+		\nextgroupplot[
+			title = \dark,
+			title color = dark
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = rep1, y = rep2, meta = enhancer] {rawData/PEfl_cor_reps_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEfl_cor_reps_dark}
+			
+			% legend
+			\legend{\enhancer{none}, \enhancer{35S}, \enhancer{AB80}, \enhancer{Cab-1}, \enhancer{rbcS-E9}}
+			
+	\end{hgroupplot}
+	
+	
+	%%% repicate correlation PEV library (light/dark)
+	\coordinate (PEV ld 1vs2) at (PEfl reps -| \textwidth - \twocolumnwidth, 0);
+	\coordinate[yshift = -\columnsep] (PEV ld 1vs3) at (PEfl reps |- xlabel.south);
+	\coordinate (PEV ld 2vs3) at (PEV ld 1vs3 -| PEV ld 1vs2);
+
+	\foreach \repA/\repB in {1/2, 1/3, 2/3}{
+		\begin{hgroupplot}[%
+			group position = {anchor = above north west, at = {(PEV ld \repA vs\repB)}, xshift = \plotylabelwidth},
+			axis limits from table = {rawData/PEV_ld_cor_reps_axes.tsv},
+			enlargelimits = .05,
+			xytick = {-10, -8, ..., 10},
+			show diagonal,
+			colormap name = viridis,
+			colorbar hexbin,
+			ylabel = {\textbf{replicate \repB}:\\$\log_2$(enhancer strength)}
+		]{\twocolumnwidth}{2}{\textbf{replicate \repA}: $\log_2$(enhancer strength)}
+		
+			\nextgroupplot[
+				title = \light,
+				title color = light
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEV_ld_cor_reps_\repA vs\repB_light_hexbin.tsv};
+				
+				% correlation
+				\stats{rawData/PEV_ld_cor_reps_\repA vs\repB_light}
+				
+				
+			\nextgroupplot[
+				title = \dark,
+				title color = dark,
+				colorbar
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEV_ld_cor_reps_\repA vs\repB_dark_hexbin.tsv};
+				
+				% correlation
+				\stats{rawData/PEV_ld_cor_reps_\repA vs\repB_dark}
+				
+		\end{hgroupplot}
+	}
+
+
+	%%% repicate correlation PEV library (circadian rhythm)
+	\coordinate[yshift = -\columnsep] (PEV cr reps) at (PEfl reps |- xlabel.south);
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(PEV cr reps)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_cor_reps_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+		colormap name = viridis,
+		colorbar hexbin,
+		ylabel = {\textbf{replicate 2}:\\$\log_2$(enhancer strength)}
+	]{\textwidth}{5}{\textbf{replicate 1}: $\log_2$(enhancer strength)}
+	
+		\pgfplotsinvokeforeach{0, 6, ..., 24}{
+			\nextgroupplot[
+				title = {\timepoint{#1}},
+				title color = t#1,
+				last plot style = {colorbar}
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEV_cr_cor_reps_#1_hexbin.tsv};
+				
+				% correlation
+				\stats{rawData/PEV_cr_cor_reps_#1};
+		}
+
+	\end{hgroupplot}
+	
+	
+	%%% repicate correlation PEF
+	\coordinate[yshift = -\columnsep] (PEF 1vs2) at (PEfl reps |- xlabel.south);
+	\coordinate (PEF 1vs3) at (PEF 1vs2 -| \textwidth - \twocolumnwidth, 0);
+	
+	\distance{PEV cr reps}{PEF 1vs2}
+	
+	\coordinate[yshift = \ydistance] (PEF 2vs3) at (PEF 1vs2);
+
+	\foreach \repA/\repB in {1/2, 1/3, 2/3}{
+		\begin{hgroupplot}[%
+			group position = {anchor = above north west, at = {(PEF \repA vs\repB)}, xshift = \plotylabelwidth},
+			axis limits from table = {rawData/PEF_cor_reps_axes.tsv},
+			enlargelimits = .05,
+			xytick = {-10, -8, ..., 10},
+			show diagonal,
+			colormap name = viridis,
+			colorbar hexbin,
+			ylabel = {\textbf{replicate \repB}:\\$\log_2$(enhancer strength)}
+		]{\twocolumnwidth}{2}{\textbf{replicate \repA}: $\log_2$(enhancer strength)}
+		
+			\nextgroupplot[
+				title = \light,
+				title color = light
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEF_cor_reps_\repA vs\repB_light_hexbin.tsv};
+				
+				% correlation
+				\stats{rawData/PEF_cor_reps_\repA vs\repB_light};
+				
+				
+			\nextgroupplot[
+				title = \dark,
+				title color = dark,
+				colorbar
+			]
+			
+				% hexbin plot
+				\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEF_cor_reps_\repA vs\repB_dark_hexbin.tsv};
+				
+				% correlation
+				\stats{rawData/PEF_cor_reps_\repA vs\repB_dark};
+				
+		\end{hgroupplot}
+	}
+	
+	
+	%%% replicate correlation PEVdouble library
+	\coordinate (PEval reps) at (PEF 2vs3 -| \textwidth - \twocolumnwidth, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(PEval reps)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEval_cor_reps_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+		colormap name = viridis,
+		colorbar hexbin,
+		ylabel = {\textbf{replicate 2}:\\$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{\textbf{replicate 1}: $\log_2$(enhancer strength)}
+	
+		\nextgroupplot[
+			title = \light,
+			title color = light
+		]
+		
+			% hexbin plot
+			\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEval_cor_reps_light_hexbin.tsv};
+			
+			% correlation
+			\stats{rawData/PEval_cor_reps_light};
+			
+			
+		\nextgroupplot[
+			title = \dark,
+			title color = dark,
+			colorbar
+		]
+		
+			% hexbin plot
+			\addplot [hexbin] table [x = x, y = y, meta = count] {rawData/PEval_cor_reps_dark_hexbin.tsv};
+			
+			% correlation
+			\stats{rawData/PEval_cor_reps_dark};
+			
+	\end{hgroupplot}
+	
+
+	%%% subfigure labels
+	\subfiglabel{PEfl reps}
+	\subfiglabel{PEV ld 1vs2}
+	\subfiglabel{PEV ld 1vs3}
+	\subfiglabel{PEV ld 2vs3}
+	\subfiglabel{PEV cr reps}
+	\subfiglabel{PEF 1vs2}
+	\subfiglabel{PEF 1vs3}
+	\subfiglabel{PEF 2vs3}
+	\subfiglabel{PEval reps}
+	
+	\end{tikzpicture}

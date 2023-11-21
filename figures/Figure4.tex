@@ -1,0 +1,283 @@
+\begin{tikzpicture}
+
+	%%% scheme of circadian rhythm experiment
+	\coordinate (cr scheme) at (0, 0);
+	
+	% will be drawn after next plot
+	
+	
+	%%% circadian rhythm of enhancer activity
+	\coordinate (circadian rhythm) at (cr scheme -| \textwidth - \threequartercolumnwidth, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(circadian rhythm)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cr_WT_axes.tsv},
+		enlarge x limits = false,
+		enlarge y limits = {value = .25, upper},
+		xtick = {8, 12, ..., 32},
+		ytick = {-1, -.5, ..., 3},
+		y decimals = 1,
+		ylabel = $\log_2$(enhancer strength),
+		execute at begin axis/.append = {\fill[dark, fill opacity = .1] (16, \ymin) rectangle (24, \ymax);},
+		xticklabel style = {name = xticklabel},
+		zero line,
+	]{\threequartercolumnwidth}{3}{time in constant light (ZT)}	
+		
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer\\\segment{B} segment,
+			title color = AB80
+		]
+			
+			% amplitude & stats
+			\addplot[
+				quiver = {u = 0, v = \thisrow{amplitude}},
+				<->,
+				x filter/.code = {\def\tempA{AB80}\edef\tempB{\thisrow{enhancer}}\ifx\tempA\tempB\relax\else\def\pgfmathresult{}\fi},
+				visualization depends on = \thisrow{amplitude} \as \amp,
+				visualization depends on = \thisrow{peak} \as \peak,
+				visualization depends on = \thisrow{rsquare} \as \rsquare,
+				nodes near coords = {%
+					$\text{amplitude} = \pgfmathprintnumber[fixed, fixed zerofill, precision = 2]{\amp}$\\%
+					$\text{peak time} = \text{ZT }\pgfmathprintnumber[fixed, precision = 0]{\peak}$\\%
+					$R^2 = \pgfmathprintnumber[fixed, fixed zerofill, precision = 2]{\rsquare}$
+				},
+				nodes near coords style = {anchor = north west, at = {(current axis.north west)}, align = left}
+			] table [x = peak, y expr = 0] {rawData/PEV_cr_WT_stats.tsv};
+
+			
+			% fitted line
+			\addplot[line plot, AB80!50] table [x = ZT, y = AB80] {rawData/PEV_cr_WT_lines.tsv};
+					
+			% points
+			\addplot [
+				only marks,
+				mark = solido,
+				mark size = 2,
+				AB80
+			] table[x = ZT, y = AB80] {rawData/PEV_cr_WT_points.tsv};
+		
+		
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer\\\segment{B} segment,
+			title color = Cab-1
+		]
+		
+			% amplitude & stats
+			\addplot[
+				quiver = {u = 0, v = \thisrow{amplitude}},
+				<->,
+				x filter/.code = {\def\tempA{Cab-1}\edef\tempB{\thisrow{enhancer}}\ifx\tempA\tempB\relax\else\def\pgfmathresult{}\fi},
+				visualization depends on = \thisrow{amplitude} \as \amp,
+				visualization depends on = \thisrow{peak} \as \peak,
+				visualization depends on = \thisrow{rsquare} \as \rsquare,
+				nodes near coords = {%
+					$\text{amplitude} = \pgfmathprintnumber[fixed, fixed zerofill, precision = 2]{\amp}$\\%
+					$\text{peak time} = \text{ZT }\pgfmathprintnumber[fixed, precision = 0]{\peak}$\\%
+					$R^2 = \pgfmathprintnumber[fixed, fixed zerofill, precision = 2]{\rsquare}$
+				},
+				nodes near coords style = {anchor = north west, at = {(current axis.north west)}, align = left}
+			] table [x = peak, y expr = 0] {rawData/PEV_cr_WT_stats.tsv};
+		
+			% fitted line
+			\addplot[line plot, Cab-1!50] table [x = ZT, y = Cab-1] {rawData/PEV_cr_WT_lines.tsv};
+					
+			% points
+			\addplot [
+				only marks,
+				mark = solido,
+				mark size = 2,
+				Cab-1
+			] table[x = ZT, y = Cab-1] {rawData/PEV_cr_WT_points.tsv};
+		
+		
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+			title color = rbcS-E9
+		]
+		
+			% amplitude & stats
+			\addplot[
+				quiver = {u = 0, v = \thisrow{amplitude}},
+				<->,
+				x filter/.code = {\def\tempA{rbcS-E9}\edef\tempB{\thisrow{enhancer}}\ifx\tempA\tempB\relax\else\def\pgfmathresult{}\fi},
+				visualization depends on = \thisrow{amplitude} \as \amp,
+				visualization depends on = \thisrow{peak} \as \peak,
+				visualization depends on = \thisrow{rsquare} \as \rsquare,
+				nodes near coords = {%
+					$\text{amplitude} = \pgfmathprintnumber[fixed, fixed zerofill, precision = 2]{\amp}$\\%
+					$\text{peak time} = \text{ZT }\pgfmathprintnumber[fixed, precision = 0]{\peak}$\\%
+					$R^2 = \pgfmathprintnumber[fixed, fixed zerofill, precision = 2]{\rsquare}$
+				},
+				nodes near coords style = {anchor = north west, at = {(current axis.north west)}, align = left}
+			] table [x = peak, y expr = 0] {rawData/PEV_cr_WT_stats.tsv};
+		
+			% fitted line
+			\addplot[line plot, rbcS-E9!50] table [x = ZT, y = rbcS-E9] {rawData/PEV_cr_WT_lines.tsv};
+					
+			% points
+			\addplot [
+				only marks,
+				mark = solido,
+				mark size = 2,
+				rbcS-E9
+			] table[x = ZT, y = rbcS-E9] {rawData/PEV_cr_WT_points.tsv};
+			
+	\end{hgroupplot}
+	
+	
+	%%% scheme of circadian rhythm experiment (continued)
+	\distance{group c1r1.south}{group c1r1.above north}
+	\pgfmathsetlength{\templength}{\ydistance/80}
+	
+	\coordinate[xshift = \columnsep] (light bar top left) at (cr scheme);
+	
+	\fill[light] (light bar top left) rectangle ++(\columnsep, -80\templength) coordinate (light bar bottom right);
+	\fill[dark] (light bar top left) ++(0, -16\templength) rectangle ++(\columnsep, -8\templength) ++(-\columnsep, -16\templength) rectangle ++(\columnsep, -8\templength) coordinate (ZT0);
+	
+	\draw[Latex-, thick] (light bar top left -| light bar bottom right) ++(.05, -4\templength) -- ++(.5, 0) node[anchor = west, text depth = 0pt, inner sep = .15em] (infiltration) {infiltration};
+	
+	\coordinate[yshift = -.67cm] (leaf) at (infiltration.south);
+	\leaf[.33]{leaf}
+	
+	\foreach \x in {-8, 0, 6, ..., 24}{
+		\draw[Latex-, thick] (ZT0) ++(.05, {(-8 - \x) * \templength}) -- ++(.5, 0) node[anchor = west, text depth = 0pt, inner sep = .15em] (t\x) {\timepoint{\x}};
+	}
+	
+	\draw[decorate, decoration = {brace, amplitude = .25cm}] (t0.north -| t24.east) -- (t24.south east) node[pos = .5, xshift = .25cm, anchor = west, align = left] {sampled\\timepoints};
+	
+	
+	%%% histograms of variant effects (amplitude and enhancer strength)
+	\coordinate[yshift = -\columnsep] (amplitude histograms) at (cr scheme |- xlabel.south);
+	
+	\distance{title.south}{title.north}
+	\pgfmathsetlength{\plotwidth}{(\textwidth - 2\plotylabelwidth - \columnsep - \groupplotsep - 2\ydistance - .5\baselineskip) / 3}
+	
+	\node[anchor = north west, draw, fill = gray!20, text depth = 0pt, minimum width = \plotwidth, xshift = \plotylabelwidth] (tamplitude) at (amplitude histograms) {\vphantom{(\textDelta lhpg)}\textDelta{} amplitude};
+	
+	\begin{hvgroupplot}[%
+		group position = {anchor = north west, at = {(tamplitude.south west)}, shift = {(.5\pgflinewidth, .5\pgflinewidth)}},
+		enlarge x limits = {value = .05, upper},
+		enlarge y limits = .05,
+		ytick = {-5, -4, ..., 5},
+		zero line,
+		title style = {
+			anchor = south,
+			at = {(1, .5)},
+			rotate = -90,
+			minimum width = \plotheight,
+			fill = titlecol!20,
+			draw = black,
+			shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}
+		}
+	]{2\plotwidth + \plotylabelwidth + \groupplotsep}{10.5cm + \plotxlabelheight + 2\groupplotsep}{2}{3}{number of variants}{$\log_2$(enhancer strength)}
+		
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_cr_amplitude_axes.tsv}
+		]
+		
+			\histogram[fill = AB80]{rawData/PEV_cr_amplitude_AB80}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_cr_enrichment_axes.tsv},
+			title = \enhancer{AB80} enhancer\\\segment{B} segment,
+			title color = AB80
+		]
+		
+			\histogram[fill = AB80]{rawData/PEV_cr_enrichment_AB80}{count}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_cr_amplitude_axes.tsv}
+		]
+		
+			\histogram[fill = Cab-1]{rawData/PEV_cr_amplitude_Cab-1}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_cr_enrichment_axes.tsv},
+			title = \enhancer{Cab-1} enhancer\\\segment{B} segment,
+			title color = Cab-1
+		]
+		
+			\histogram[fill = Cab-1]{rawData/PEV_cr_enrichment_Cab-1}{count}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_cr_amplitude_axes.tsv}
+		]
+		
+			\histogram[fill = rbcS-E9]{rawData/PEV_cr_amplitude_rbcS-E9}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_cr_enrichment_axes.tsv},
+			title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+			title color = rbcS-E9
+		]
+		
+			\histogram[fill = rbcS-E9]{rawData/PEV_cr_enrichment_rbcS-E9}{count}
+			
+	\end{hvgroupplot}
+	
+	\node[anchor = south, draw, fill = gray!20, text depth = 0pt, minimum width = \plotwidth, yshift = -.5\pgflinewidth] (tstrength) at (group c2r1.north) {\textDelta{} enhancer strength (\timepoint{0})};
+	
+	
+	%%% histograms of variant effects (peak)
+	\coordinate[xshift = \columnsep] (peak histograms) at (amplitude histograms -| title.north);
+	
+	\node[anchor = north west, draw, fill = gray!20, text depth = 0pt, minimum width = \plotwidth, xshift = \plotylabelwidth + .5\baselineskip] (tpeak) at (peak histograms) {\vphantom{(lhpg)}\textDelta{} peak time};
+	
+	\begin{vgroupplot}[%
+		group position = {anchor = north west, at = {(tpeak.south west)}, shift = {(.5\pgflinewidth, .5\pgflinewidth)}},
+		width = \plotwidth,
+		xlabel = {number of variants},
+		ytick = {-12, -8, ..., 12},
+		enlarge x limits = {value = .05, upper},
+		enlarge y limits = .05,
+		axis limits from table = {rawData/PEV_cr_peak_axes.tsv},
+		zero line,
+		title style = {
+			anchor = south,
+			at = {(1, .5)},
+			rotate = -90,
+			minimum width = \plotheight,
+			fill = titlecol!20,
+			draw = black,
+			shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}
+		}
+	]{10.5cm + \plotxlabelheight + 2\groupplotsep}{3}{peak shift (h)}
+	
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer\\\segment{B} segment,
+			title color = AB80
+		]
+		
+			\histogram[fill = AB80!25!gray]{rawData/PEV_cr_peak_AB80}{badFit}
+			\histogram[fill = AB80]{rawData/PEV_cr_peak_AB80}{goodFit}
+			
+	
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer\\\segment{B} segment,
+			title color = Cab-1
+		]
+		
+			\histogram[fill = Cab-1!25!gray]{rawData/PEV_cr_peak_Cab-1}{badFit}
+			\histogram[fill = Cab-1]{rawData/PEV_cr_peak_Cab-1}{goodFit}
+			
+	
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+			title color = rbcS-E9
+		]
+		
+			\histogram[fill = rbcS-E9!25!gray]{rawData/PEV_cr_peak_rbcS-E9}{badFit}
+			\histogram[fill = rbcS-E9]{rawData/PEV_cr_peak_rbcS-E9}{goodFit}
+	
+	\end{vgroupplot}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{cr scheme}
+	\subfiglabel[xshift = -.5\baselineskip]{circadian rhythm}
+	\subfiglabel{amplitude histograms}
+	\subfiglabel{peak histograms}
+	
+\end{tikzpicture}

@@ -1,0 +1,60 @@
+\begin{tikzpicture}
+
+	%%% dual-luciferase assy in light and dark
+	\coordinate (DL plot) at (0, 0);
+	
+	\def\shadeplot{%
+		\fill[light, fill opacity = .1] (\xmin, \ymin) rectangle (1, \ymax) (1.5, \ymin) rectangle (2, \ymax) (2.5, \ymin) rectangle (3, \ymax) (3.5, \ymin) rectangle (4, \ymax) (4.5, \ymin) rectangle (5, \ymax);
+		\fill[dark, fill opacity = .1] (1, \ymin) rectangle (1.5, \ymax) (2, \ymin) rectangle (2.5, \ymax) (3, \ymin) rectangle (3.5, \ymax) (4, \ymin) rectangle (4.5, \ymax) (5, \ymin) rectangle (\xmax, \ymax);
+		\draw (1.5, \ymin) -- (1.5, \ymax) (2.5, \ymin) -- (2.5, \ymax) (3.5, \ymin) -- (3.5, \ymax) (4.5, \ymin) -- (4.5, \ymax);
+	}
+	
+	\begin{axis}[%
+		anchor = north west,
+		at = {(DL plot)},
+		width = \twocolumnwidth - \plotylabelwidth,
+		xshift = \plotylabelwidth,
+		x grids = false,
+		axis limits from table = {rawData/DL_enhancers_ld_axes.tsv},
+		enlarge y limits = {value = .125, lower},
+		zero line,
+		xlabel = enhancer,
+		ylabel = $\log_2$(NanoLuc/Luc),
+		x tick table half enhancer = {rawData/DL_enhancers_ld_boxplot.tsv}{enhancer},
+		execute at begin axis/.append = {\shadeplot},
+	]
+
+		% boxplots
+		\halfboxplots[]{%
+			box colors from table = {rawData/DL_enhancers_ld_boxplot.tsv}{enhancer},
+			fill opacity = .5
+		}{rawData/DL_enhancers_ld}
+		
+		% add sample size
+		\samplesizehalf[nodes near coords style = {name = samplesize}]{rawData/DL_enhancers_ld_boxplot.tsv}{id}{n}
+		
+		% save coordinates
+		\pgfplotsinvokeforeach{1, ..., 5}{		
+			\coordinate (DL #1) at (#1, 0);
+		}
+		\coordinate (DL dist) at (1.225, 0);
+
+	\end{axis}
+	
+	% light labels
+	\distance{DL 1}{DL dist}
+	
+	\foreach \x in {1, ..., 5}{
+		\node[anchor = south, font = \bfseries\vphantom{A}, xshift = -\xdistance, text depth = 0pt] (lplus) at (last plot.south -| DL \x) {+};
+		\node[anchor = south, font = \bfseries\vphantom{A}, xshift = \xdistance, text depth = 0pt] at (last plot.south -| DL \x) {\textminus};		
+	}
+	
+	\node[anchor = base east, node font = \figsmall, text depth = 0pt] at (last plot.west |- lplus.base) {light};
+	
+	\draw[dashed] (last plot.west |- samplesize.south) -- (last plot.east |- samplesize.south);
+	
+	
+	%%% subfigure labels
+	\subfiglabel{DL plot}
+
+\end{tikzpicture}

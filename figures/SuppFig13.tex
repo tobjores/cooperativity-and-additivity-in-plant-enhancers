@@ -1,0 +1,132 @@
+\begin{tikzpicture}
+	\addtolength{\plotylabelwidth}{\baselineskip}
+
+	%%% correlation between PEVdouble and PEV libraries
+	\coordinate (PEVdouble vs PEV) at (0, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(PEVdouble vs PEV)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEVdouble_cor_PEV_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		legend style = {anchor = south east, at = {(1, 0)}},
+		legend image post style = {fill opacity = 1, mark size = 1.25},
+		legend plot pos = right,
+		legend cell align = right,
+		scatter/classes = {
+			AB80={AB80},
+			Cab-1={Cab-1},
+			rbcS-E9={rbcS-E9}
+		},
+		show diagonal,
+		ylabel = {\textbf{double-deletion library}:\\$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{\textbf{single-nucleotide variant library}: $\log_2$(enhancer strength)}
+	
+		\nextgroupplot[
+			title = \light,
+			title color = light,
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = enrichment_PEV_ld, y = enrichment_PEVdouble, meta = enhancer] {rawData/PEVdouble_cor_PEV_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEVdouble_cor_PEV_light};
+			
+			
+		\nextgroupplot[
+			title = \dark,
+			title color = dark,
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = enrichment_PEV_ld, y = enrichment_PEVdouble, meta = enhancer] {rawData/PEVdouble_cor_PEV_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEVdouble_cor_PEV_dark};
+			
+			% legend
+			\legend{\enhancer{AB80}, \enhancer{Cab-1}, \enhancer{rbcS-E9}}
+			
+	\end{hgroupplot}
+	
+	
+	%%% correlation between PEFval and PEF libraries
+	\coordinate (PEFval vs PEF) at (PEVdouble vs PEV -| \textwidth - \twocolumnwidth, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(PEFval vs PEF)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEFval_cor_PEF_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		legend style = {anchor = south east, at = {(1, 0)}},
+		legend image post style = {fill opacity = 1, mark size = 1.25},
+		legend plot pos = right,
+		legend cell align = right,
+		scatter/classes = {
+			1={t0},
+			2={t12},
+			3={t18}
+		},
+		show diagonal,
+		ylabel = {\textbf{validation library}:\\$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{\textbf{large-scale library}: $\log_2$(enhancer strength)}
+	
+		\nextgroupplot[
+			title = \light,
+			title color = light,
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = enrichment_PEF, y = enrichment_PEFval, meta = n_frags] {rawData/PEFval_cor_PEF_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEFval_cor_PEF_light};
+			
+			
+		\nextgroupplot[
+			title = \dark,
+			title color = dark,
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = enrichment_PEF, y = enrichment_PEFval, meta = n_frags] {rawData/PEFval_cor_PEF_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEFval_cor_PEF_dark};
+			
+			% legend
+			\legend{1 fragment, 2 fragments, 3 fragments}
+			
+	\end{hgroupplot}
+
+
+	%%% subfigure labels
+	\subfiglabel{PEVdouble vs PEV}
+	\subfiglabel{PEFval vs PEF}
+
+\end{tikzpicture}

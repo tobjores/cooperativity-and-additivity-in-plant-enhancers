@@ -1,0 +1,121 @@
+\begin{tikzpicture}
+
+	%%% correlation of variant effects in overlapping region
+	\coordinate (overlap) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt, font = \hphantom{A}] (ptitle) at (overlap) {\vphantom{\light}};
+	
+	\distance{ptitle.south}{ptitle.north}
+	
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(overlap)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_cor_overlap_axes.tsv},
+		enlargelimits = .05,
+		xytick = {-10, -8, ..., 10},
+		show diagonal,
+	]{\textwidth - \ydistance}{7cm + \plotxlabelheight + \groupplotsep}{3}{2}{\textbf{\segment{A} segment}: $\log_2$(enhancer strength)}{\textbf{\segment{B} segment}: $\log_2$(enhancer strength)}
+	
+		\nextgroupplot[
+			title = \enhancer{AB80},
+			title color = AB80
+		]
+		
+			% scatter plot
+			\addplot [
+				AB80,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = partA, y = partB] {rawData/PEV_cor_overlap_AB80_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEV_cor_overlap_AB80_light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1},
+			title color = Cab-1
+		]
+		
+			% scatter plot
+			\addplot [
+				Cab-1,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = partA, y = partB] {rawData/PEV_cor_overlap_Cab-1_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEV_cor_overlap_Cab-1_light}
+			
+	
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9},
+			title color = rbcS-E9
+		]
+		
+			% scatter plot
+			\addplot [
+				rbcS-E9,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = partA, y = partB] {rawData/PEV_cor_overlap_rbcS-E9_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEV_cor_overlap_rbcS-E9_light}
+			
+			
+		\nextgroupplot
+		
+			% scatter plot
+			\addplot [
+				AB80,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = partA, y = partB] {rawData/PEV_cor_overlap_AB80_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEV_cor_overlap_AB80_dark}
+			
+			
+		\nextgroupplot
+		
+			% scatter plot
+			\addplot [
+				Cab-1,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = partA, y = partB] {rawData/PEV_cor_overlap_Cab-1_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEV_cor_overlap_Cab-1_dark}
+			
+	
+		\nextgroupplot
+		
+			% scatter plot
+			\addplot [
+				rbcS-E9,
+				only marks,
+				mark = solido,
+				fill opacity = .5
+			] table[x = partA, y = partB] {rawData/PEV_cor_overlap_rbcS-E9_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEV_cor_overlap_rbcS-E9_dark}
+			
+	\end{hvgroupplot}
+	
+	\distance{group c3r1.south}{group c3r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c3r1.north east) {\light};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tdark) at (group c3r2.north east) {\dark};
+
+	
+	%%% subfigure labels
+	\subfiglabel{overlap}
+
+\end{tikzpicture}

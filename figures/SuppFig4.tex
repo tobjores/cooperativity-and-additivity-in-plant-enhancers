@@ -1,0 +1,184 @@
+%%% add number of variants with a given effect to plots
+\newcommand{\varEffects}[2][]{%
+	\addplot [
+		only marks,
+		mark = text,
+		text mark as node = true,
+		stats position = south,
+		text mark = {
+			\phantom{decreasing}\llap{increasing} $= \pgfmathprintnumber[fixed, 1000 sep = {{{{,}}}}]{\increase}$\\
+			\phantom{decreasing}\llap{neutral} $= \pgfmathprintnumber[fixed, 1000 sep = {{{{,}}}}]{\neutral}$\\
+			\phantom{decreasing}\llap{decreasing} $= \pgfmathprintnumber[fixed, 1000 sep = {{{{,}}}}]{\decrease}$
+		},
+		visualization depends on = \thisrow{increase} \as \increase,
+		visualization depends on = \thisrow{neutral} \as \neutral,
+		visualization depends on = \thisrow{decrease} \as \decrease,
+		#1,
+	] table [x expr = 0, y expr = 0] {#2_stats.tsv};
+}
+
+%%% histograms with weak variants in a lighter color
+\pgfplotsset{
+	weak/.style = {x filter/.expression = {\thisrow{y} >= -1 && \thisrow{y} <= 1 ? \thisrow{count} : 0}},
+	strong/.style = {x filter/.expression = {\thisrow{y} < -1 || \thisrow{y} > 1 ? \thisrow{count} : 0}}
+}
+
+\newcommand{\histogramStrength}[3][]{%
+	\histogram[fill = #1!33, weak]{#2}{#3}%
+	\histogram[fill = #1, strong]{#2}{#3}%
+	\varEffects{#2}%
+}
+
+\begin{tikzpicture}
+
+	%%% summary of variant effects for the 5' enhancer segments
+	\coordinate (part A) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt, align = center] (ptitle) at (part A) {\vphantom{\enhancer{AB80} enhancer}\\\vphantom{\segment{B} segment}};
+	\distance{ptitle.south}{ptitle.north}
+	\pgfmathsetlength{\plotwidth}{(\twocolumnwidth - \plotylabelwidth - \groupplotsep - \ydistance) / 2}
+	
+	\node[anchor = north west, draw, fill = light!20, text depth = 0pt, minimum width = \plotwidth, xshift = \plotylabelwidth] (tlight) at (part A) {\light};
+	
+	\begin{hvgroupplot}[%
+		group position = {anchor = north west, at = {(tlight.south west)}, shift = {(.5\pgflinewidth, .5\pgflinewidth)}},
+		enlarge x limits = {value = .05, upper},
+		enlarge y limits = .05,
+		ytick = {-6, -4, ..., 5},
+		zero line,
+		title style = {
+			anchor = south,
+			at = {(1, .5)},
+			rotate = -90,
+			minimum width = \plotheight,
+			fill = titlecol!20,
+			draw = black,
+			shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}
+		}
+	]{2\plotwidth + \plotylabelwidth + \groupplotsep}{10.5cm + \plotxlabelheight + 2\groupplotsep}{2}{3}{number of variants}{$\log_2$(enhancer strength)}
+		
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_A_light_axes.tsv}
+		]
+		
+			\histogramStrength[AB80]{rawData/PEV_ld_summary_AB80_A_light}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_A_dark_axes.tsv},
+			title = \enhancer{AB80} enhancer\\\segment{A} segment,
+			title color = AB80
+		]
+		
+			\histogramStrength[AB80]{rawData/PEV_ld_summary_AB80_A_dark}{count}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_A_light_axes.tsv}
+		]
+		
+			\histogramStrength[Cab-1]{rawData/PEV_ld_summary_Cab-1_A_light}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_A_dark_axes.tsv},
+			title = \enhancer{Cab-1} enhancer\\\segment{A} segment,
+			title color = Cab-1
+		]
+		
+			\histogramStrength[Cab-1]{rawData/PEV_ld_summary_Cab-1_A_dark}{count}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_A_light_axes.tsv}
+		]
+		
+			\histogramStrength[rbcS-E9]{rawData/PEV_ld_summary_rbcS-E9_A_light}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_A_dark_axes.tsv},
+			title = \enhancer{rbcS-E9} enhancer\\\segment{A} segment,
+			title color = rbcS-E9
+		]
+		
+			\histogramStrength[rbcS-E9]{rawData/PEV_ld_summary_rbcS-E9_A_dark}{count}
+			
+	\end{hvgroupplot}
+	
+	\node[anchor = south, draw, fill = dark!20, text depth = 0pt, minimum width = \plotwidth, yshift = -.5\pgflinewidth] (tdark) at (group c2r1.north) {\dark};
+	
+	
+	%%% summary of variant effects for the 3' enhancer segments
+	\coordinate (part B) at (part A -| \textwidth - \twocolumnwidth, 0);
+	
+	\node[anchor = north west, draw, fill = light!20, text depth = 0pt, minimum width = \plotwidth, xshift = \plotylabelwidth] (tlight) at (part B) {\light};
+	
+	\begin{hvgroupplot}[%
+		group position = {anchor = north west, at = {(tlight.south west)}, shift = {(.5\pgflinewidth, .5\pgflinewidth)}},
+		enlarge x limits = {value = .05, upper},
+		enlarge y limits = .05,
+		ytick = {-6, -4, ..., 5},
+		zero line,
+		title style = {
+			anchor = south,
+			at = {(1, .5)},
+			rotate = -90,
+			minimum width = \plotheight,
+			fill = titlecol!20,
+			draw = black,
+			shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}
+		}
+	]{2\plotwidth + \plotylabelwidth + \groupplotsep}{10.5cm + \plotxlabelheight + 2\groupplotsep}{2}{3}{number of variants}{$\log_2$(enhancer strength)}
+		
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_B_light_axes.tsv}
+		]
+		
+			\histogramStrength[AB80]{rawData/PEV_ld_summary_AB80_B_light}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_B_dark_axes.tsv},
+			title = \enhancer{AB80} enhancer\\\segment{B} segment,
+			title color = AB80
+		]
+		
+			\histogramStrength[AB80]{rawData/PEV_ld_summary_AB80_B_dark}{count}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_B_light_axes.tsv}
+		]
+		
+			\histogramStrength[Cab-1]{rawData/PEV_ld_summary_Cab-1_B_light}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_B_dark_axes.tsv},
+			title = \enhancer{Cab-1} enhancer\\\segment{B} segment,
+			title color = Cab-1
+		]
+		
+			\histogramStrength[Cab-1]{rawData/PEV_ld_summary_Cab-1_B_dark}{count}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_B_light_axes.tsv}
+		]
+		
+			\histogramStrength[rbcS-E9]{rawData/PEV_ld_summary_rbcS-E9_B_light}{count}
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEV_ld_summary_B_dark_axes.tsv},
+			title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+			title color = rbcS-E9
+		]
+		
+			\histogramStrength[rbcS-E9]{rawData/PEV_ld_summary_rbcS-E9_B_dark}{count}
+			
+	\end{hvgroupplot}
+	
+	\node[anchor = south, draw, fill = dark!20, text depth = 0pt, minimum width = \plotwidth, yshift = -.5\pgflinewidth] (tdark) at (group c2r1.north) {\dark};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{part A}
+	\subfiglabel{part B}
+
+\end{tikzpicture}

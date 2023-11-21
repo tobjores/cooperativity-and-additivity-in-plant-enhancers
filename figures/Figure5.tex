@@ -1,0 +1,149 @@
+\begin{tikzpicture}
+	\addtolength{\plotylabelwidth}{\baselineskip}
+	
+	\pgfplotsset{
+		colorbar distance/.style = {
+			colorbar horizontal,
+			colorbar style = {
+				anchor = south west,
+				at = {(.025, .025)},
+				height = .25cm,
+				width = .4 * \pgfkeysvalueof{/pgfplots/parent axis height},
+				tick pos = upper,
+				xticklabel pos = right,
+				xticklabel style = {node font = \figtiny, inner ysep = .1em, text depth = 0pt},
+				title = distance (bp)\\\vphantom{1},
+				title style = {fill = none, draw = none, minimum width = 0, node font = \figsmall, align = center, anchor = south},
+				extra x ticks = {8},
+			},
+		}
+	}
+	
+	%%% effect of two deletions in light
+	\coordinate[yshift = -\columnsep] (prediction light) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt, font = \hphantom{A}] (ptitle) at (prediction light) {\vphantom{\light}};
+	
+	\distance{ptitle.south}{ptitle.north}
+	
+	\pgfmathsetlength{\templength}{(\textwidth + \pgflinewidth - 2\plotylabelwidth - 2\groupplotsep - 2\ydistance - \columnsep) / 4}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(prediction light)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEVdouble_prediction_light_axes.tsv},
+		enlargelimits = .05,
+		ylabel = \textbf{measurement}:\\$\log_2$(enhancer strength),
+		zero line,
+		show diagonal,
+		colormap name = viridis,
+		colorbar distance,
+		point meta min = 8
+	]{3\templength + \plotylabelwidth + 2\groupplotsep}{3}{\textbf{additive model}: $\log_2$(enhancer strength)}
+		
+		\nextgroupplot[
+			title = \enhancer{AB80},
+			title color = AB80
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_AB80_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_AB80_light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1},
+			title color = Cab-1
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_Cab-1_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_Cab-1_light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9},
+			title color = rbcS-E9
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_light}
+		
+	\end{hgroupplot}
+	
+	\distance{group c3r1.south}{group c3r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c3r1.north east) {\light};
+	
+	
+	%%% effect of two deletions in dark
+	\coordinate[xshift = \columnsep] (prediction dark) at (group c3r1.above north -| tlight.north);
+	
+	\begin{axis}[%
+		name = dark plot,
+		anchor = above north west,
+		at = {(prediction dark)},
+		xshift = \plotylabelwidth,
+		width = \templength,
+		axis limits from table = {rawData/PEVdouble_prediction_dark_axes.tsv},
+		enlargelimits = .05,
+		ylabel = \textbf{measurement}:\\$\log_2$(enhancer strength),
+		zero line,
+		show diagonal,
+		title = \enhancer{rbcS-E9},
+		title color = rbcS-E9,
+		title style = {minimum width = \templength},
+		xlabel = \textbf{additive model}:\\$\log_2$(enhancer strength),
+		colormap name = viridis,
+		colorbar distance,
+		point meta min = 8
+	]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_dark_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_dark}
+		
+	\end{axis}
+	
+	\distance{dark plot.south}{dark plot.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (dark plot.north east) {\dark};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{prediction light}
+	\subfiglabel{prediction dark}
+	
+\end{tikzpicture}

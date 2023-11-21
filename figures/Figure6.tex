@@ -1,0 +1,351 @@
+\begin{tikzpicture}
+	\pgfmathsetseed{1}
+
+	%%% fragment overview
+	\coordinate (overview) at (0, 0);
+	
+	\begin{scope}
+		\setlength{\groupplotsep}{\columnsep}
+		
+		\begin{hgroupplot}[%
+			group position = {anchor = above north west, at = {(overview)}, xshift = \columnsep},
+			height = 1.5cm,
+			axis lines = none,
+			title style = {signal, anchor = south west, at = {(0, 1)}, minimum width = \plotwidth - 1.25\pgflinewidth},
+			zero line,
+			clip = false,
+			legend style = {anchor = south west, at = {(0, 0)}},
+			legend image post style = {very thick},
+			legend plot pos = left,
+			legend cell align = left,
+			enlarge y limits = .05
+		]{\textwidth + \plotylabelwidth - \columnsep}{3}{}
+			
+			\nextgroupplot[
+				title = \enhancer{AB80} enhancer \segment{B} segment,
+				title color = AB80,
+				axis limits from table = {rawData/PEV_ld_mutSens_AB80_recap_axes.tsv},
+				axis limits = AB80 B,
+			]
+			
+				\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_AB80_B_lines.tsv};
+				\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_AB80_B_lines.tsv};
+				
+				\enhFrag[-1]{168}{23}{AB80}{a}
+				\enhFrag[-1]{193}{19}{AB80}{b}
+				\enhFrag[0]{205}{19}{AB80}{c}
+				\enhFrag[-2]{198}{33}{AB80}{bc}
+				\enhFrag[-1]{228}{23}{AB80}{d}
+				
+				\legend{dark, light}
+				
+			\nextgroupplot[
+				title = \enhancer{Cab-1} enhancer \segment{B} segment,
+				title color = Cab-1,
+				axis limits from table = {rawData/PEV_ld_mutSens_Cab-1_recap_axes.tsv},
+				axis limits = Cab-1 B,
+			]
+			
+				\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_Cab-1_B_lines.tsv};
+				\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_Cab-1_B_lines.tsv};
+				
+				\enhFrag[-1]{119}{21}{Cab-1}{ctrl}
+				\enhFrag[-1]{149}{19}{Cab-1}{a}
+				\enhFrag[-1]{179}{21}{Cab-1}{b}
+				\enhFrag[0]{193}{19}{Cab-1}{c}
+				\enhFrag[-2]{184}{35}{Cab-1}{bc}
+				\enhFrag[-1]{220}{25}{Cab-1}{d}
+				\enhFrag[0]{239}{19}{Cab-1}{e}
+				\enhFrag[-2]{229}{41}{Cab-1}{de}
+				
+				
+			\nextgroupplot[
+				title = \enhancer{rbcS-E9} enhancer \segment{B} segment,
+				title color = rbcS-E9,
+				axis limits from table = {rawData/PEV_ld_mutSens_rbcS-E9_recap_axes.tsv},
+				axis limits = rbcS-E9 B,
+			]
+			
+				\addplot[draw = none, fill = dark, fill opacity = .33, restrict x to domain = 131:151] table [x = position, y = dark] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv} -- (151, 0) -| cycle;
+				\addplot[draw = none, fill = light, fill opacity = .33, restrict x to domain = 161:185] table [x = position, y = light] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv} -- (185, 0) -| cycle;
+			
+				\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv};
+				\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv};
+				
+				\node[node font = \figsmall, inner sep = .15em] (AUC) at (156, -1.6) {AUC};
+				\draw[thin] (AUC) -- (140, -.4) (AUC) -- (175, -.75);
+				
+				\enhFrag[0]{109}{17}{rbcS-E9}{a}
+				\enhFrag[1]{120}{17}{rbcS-E9}{b}
+				\enhFrag[-1]{115}{31}{rbcS-E9}{ab}
+				\enhFrag[0]{141}{21}{rbcS-E9}{c}
+				\enhFrag[-2]{124}{47}{rbcS-E9}{abc}
+				\enhFrag[0]{173}{25}{rbcS-E9}{d}
+				\enhFrag[1]{193}{21}{rbcS-E9}{e}
+				\enhFrag[-1]{186}{39}{rbcS-E9}{de}
+			
+		\end{hgroupplot}
+	\end{scope}
+
+	\draw[decorate, decoration = {brace, amplitude = .25cm, raise = .25cm}] (rbcS-E9 abc.south -| AB80 a.west) -- (rbcS-E9 b.north -| AB80 a.west) coordinate[pos = .5, xshift = -.5cm] (curly);
+	
+	\draw[ultra thick, -Latex] (curly) ++(.75\pgflinewidth, 0) -- ++(-.25, 0) arc[start angle = 90, end angle = 270, radius = .8cm] node[pos = .5, anchor = east, align = right] {mix \&\\match} -- ++(.25, 0) coordinate[xshift = \columnsep] (constructs);
+	
+	\coordinate[yshift = .35cm] (construct 1) at (constructs);
+	\coordinate[yshift = -.35cm] (construct 3) at (constructs);
+	
+	\PEFconstruct{construct 1}
+	\coordinate[xshift = \columnsep] (construct 2) at (construct end);
+	
+	\PEFconstruct[MediumPurple1]{construct 2}
+	
+	\PEFconstruct[HotPink1]{construct 3}
+	\coordinate[xshift = \columnsep] (construct 4) at (construct end);
+
+	\PEFconstruct[MediumOrchid3]{construct 4}
+	
+	\draw[ultra thick, -Latex] (constructs -| construct end) ++(\columnsep, 0) -- ++(1, 0) coordinate[shift = {(.667cm + \columnsep, .167)}] (leaf);
+	\leaf[.33]{leaf}
+	
+	
+	%%% PEF: enhancer strength by number of fragments
+	\coordinate[yshift = -\columnsep] (n frags) at (overview |- ORF.south);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(n frags)}, xshift = \plotylabelwidth},
+		ylabel = $\log_2$(enhancer strength),
+		ytick = {-10, -8, ..., 10},
+		axis limits from table = {rawData/PEF_strength_by_frags_axes.tsv},
+		group/every plot/.append style = {x grids = false},
+		zero line,
+	]{\twocolumnwidth}{2}{number of enhancer fragments}
+		
+		\nextgroupplot[
+			title = \light,
+			title color = light,
+			x tick table = {rawData/PEF_strength_by_frags_light_boxplot.tsv}{sample}
+		]
+		
+			% violin and box plot
+			\violinbox[%
+				violin color = {light},
+				violin shade inverse
+			]{rawData/PEF_strength_by_frags_light_boxplot.tsv}{rawData/PEF_strength_by_frags_light_violin.tsv}
+				
+			% add sample size
+			\samplesize{rawData/PEF_strength_by_frags_light_boxplot.tsv}{id}{n}
+		
+		
+		\nextgroupplot[
+			title = \dark,
+			title color = dark,
+			x tick table = {rawData/PEF_strength_by_frags_dark_boxplot.tsv}{sample}
+		]
+		
+			% violin and box plot
+			\violinbox[%
+				violin color = {dark},
+				violin shade color = white
+			]{rawData/PEF_strength_by_frags_dark_boxplot.tsv}{rawData/PEF_strength_by_frags_dark_violin.tsv}
+				
+			% add sample size
+			\samplesize{rawData/PEF_strength_by_frags_dark_boxplot.tsv}{id}{n}
+		
+	\end{hgroupplot}
+	
+	
+	%%% PEF: single fragments vs. DMS AUCs
+	\coordinate (AUC) at (n frags -| \textwidth - \twocolumnwidth, 0);
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(AUC)}, xshift = \plotylabelwidth},
+		enlargelimits = .15,
+		ytick = {-10, -8, ..., 10},
+		zero line,
+		legend style = {anchor = north east, at = {(1, 1)}},
+		legend plot pos = right,
+		legend cell align = right,
+		scatter/classes = {
+			AB80={AB80},
+			Cab-1={Cab-1},
+			rbcS-E9={rbcS-E9}
+		},
+		ylabel = {$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{$-$AUC}
+	
+		\nextgroupplot[
+			title = \light,
+			title color = light,
+			axis limits from table = {rawData/PEF_cor_AUC_light_axes.tsv},
+		]
+		
+			% regression line
+			\addplot [draw = none, forget plot] table [x = AUC, y = {create col/linear regression = { y = enrichment}}] {rawData/PEF_cor_AUC_light_points.tsv};
+			
+			\draw[gray, dashed] (\xmin, \xmin * \pgfplotstableregressiona + \pgfplotstableregressionb) -- (\xmax, \xmax * \pgfplotstableregressiona + \pgfplotstableregressionb);
+			
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				mark size = 1.25
+			] table[x = AUC, y = enrichment, meta = enhancer] {rawData/PEF_cor_AUC_light_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEF_cor_AUC_light}
+			
+			% legend
+			\legend{\enhancer{AB80}, \enhancer{Cab-1}, \enhancer{rbcS-E9}}
+			
+			
+		\nextgroupplot[
+			title = \dark,
+			title color = dark,
+			axis limits from table = {rawData/PEF_cor_AUC_dark_axes.tsv},
+		]
+		
+			% regression line
+			\addplot [draw = none, forget plot] table [x = AUC, y = {create col/linear regression = { y = enrichment}}] {rawData/PEF_cor_AUC_dark_points.tsv};
+			
+			\draw[gray, dashed] (\xmin, \xmin * \pgfplotstableregressiona + \pgfplotstableregressionb) -- (\xmax, \xmax * \pgfplotstableregressiona + \pgfplotstableregressionb);
+			
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				mark size = 1.25
+			] table[x = AUC, y = enrichment, meta = enhancer] {rawData/PEF_cor_AUC_dark_points.tsv};
+			
+			% correlation
+			\stats{rawData/PEF_cor_AUC_dark}
+			
+	\end{hgroupplot}
+	
+	
+	%%% Examples of fragments and fragment combinations (light)
+	\coordinate[yshift = -\columnsep] (frags light) at (n frags |- xlabel.south);
+	
+	\distance{title.south}{title.north}
+	
+	\pgfmathsetlength{\templength}{(\textwidth  - .5\threecolumnwidth + \pgflinewidth - 2\plotylabelwidth - 2\groupplotsep - 2\ydistance - 2\columnsep) / 4}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(frags light)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEF_fragments_light_axes.tsv},
+		enlarge y limits = .05,
+		ylabel = $\log_2$(enhancer strength),
+		zero line,
+		xticklabel style = {font = \vphantom{abcde}}
+	]{3\templength + \plotylabelwidth + 2\groupplotsep}{3}{fragments}
+		
+		\nextgroupplot[
+			title = \enhancer{AB80},
+			title color = AB80,
+			x tick table = {rawData/PEF_fragments_AB80_bc_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{AB80, mark options = {AB80!50}}{rawData/PEF_fragments_AB80_bc_light};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1},
+			title color = Cab-1,
+			x tick table = {rawData/PEF_fragments_Cab-1_bc_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{Cab-1, mark options = {Cab-1!50}}{rawData/PEF_fragments_Cab-1_bc_light};
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9},
+			title color = rbcS-E9,
+			x tick table = {rawData/PEF_fragments_rbcS-E9_ab_light_mean.tsv}{construct},
+		]
+		
+			\hmandp{rbcS-E9, mark options = {rbcS-E9!50}}{rawData/PEF_fragments_rbcS-E9_ab_light};
+		
+	\end{hgroupplot}
+	
+	\distance{group c3r1.south}{group c3r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c3r1.north east) {\light};
+	
+	
+	%%% Examples of fragments and fragment combinations (dark)
+	\coordinate[xshift = \columnsep] (frags dark) at (group c3r1.above north -| tlight.north);
+	
+	\begin{axis}[%
+		anchor = above north west,
+		at = {(frags dark)},
+		xshift = \plotylabelwidth,
+		width = \templength,
+		axis limits from table = {rawData/PEF_fragments_dark_axes.tsv},
+		enlarge y limits = .05,
+		ylabel = $\log_2$(enhancer strength),
+		zero line,
+		xticklabel style = {font = \vphantom{abcde}},
+		title = \enhancer{rbcS-E9},
+		title color = rbcS-E9,
+		title style = {minimum width = \templength},
+		x tick table = {rawData/PEF_fragments_rbcS-E9_ab_dark_mean.tsv}{construct},
+		xlabel = fragments
+	]
+		
+			\hmandp{rbcS-E9, mark options = {rbcS-E9!50}}{rawData/PEF_fragments_rbcS-E9_ab_dark};
+		
+	\end{axis}
+	
+	\distance{last plot.south}{last plot.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (last plot.north east) {\dark};
+
+
+	%%% influence of fragment order on enhancer strength
+	\coordinate (order) at (frags light -| \textwidth - .5\threecolumnwidth, 0);
+	
+	\distance{last plot.south}{last plot.above north}
+
+	\begin{axis}[%
+		anchor = above north west,
+		at = {(order)},
+		xshift = \plotylabelwidth,
+		yshift = .2\pgflinewidth,
+		width = .5\threecolumnwidth - \plotylabelwidth,
+		height = \ydistance - .5\pgflinewidth,
+		ymin = -0.4,
+		ymax = 4.2,
+		ylabel = $\log_2$(enhancer strength),
+		zero line,
+		xticklabel style = {font = \vphantom{\light\dark}},
+		x tick table = {rawData/PEF_order_diff_boxplot.tsv}{sample},
+		xlabel = condition
+	]
+		
+		% violin plots
+		\violinbox[%
+			violin colors from table = {rawData/PEF_order_diff_boxplot.tsv}{sample},
+			violin shade = 0
+		]{rawData/PEF_order_diff_boxplot.tsv}{rawData/PEF_order_diff_violin.tsv}
+		
+		% sample size
+		\samplesize{rawData/PEF_order_diff_boxplot.tsv}{id}{n}
+		
+		% p-value
+		\signif{rawData/PEF_order_diff_pvalues.tsv}{1}{2}
+		
+	\end{axis}
+
+	
+	%%% subfigure labels
+	\subfiglabel{overview}
+	\subfiglabel{n frags}
+	\subfiglabel{AUC}
+	\subfiglabel{frags light}
+	\subfiglabel{frags dark}
+	\subfiglabel{order}
+	
+\end{tikzpicture}

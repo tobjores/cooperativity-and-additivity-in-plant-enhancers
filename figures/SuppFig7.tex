@@ -1,0 +1,260 @@
+\begin{tikzpicture}
+
+	%%% mutation sensitivity (positional mean) AB80
+	\coordinate (AB80) at (0, 0);
+	
+	\pgfplotstableread{rawData/PEV_ld_TF-scan_AB80.tsv}{\TFscan}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(AB80)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_ld_mutSens_AB80_axes.tsv},
+		enlarge y limits = {value = .125, upper},
+		ytick = {-10, ..., 10},
+		ylabel = {$\log_2$(enhancer strength)},
+		title color = AB80,
+		zero line,
+		legend style = {anchor = south west, at = {(0, 0)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+	]{\textwidth}{2}{position}
+	
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer \segment{A} segment,
+			axis limits = AB80 A,
+			shade overlap A = AB80
+		]
+			
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_AB80_A_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_AB80_A_lines.tsv};
+			
+			\foreachtablerow{\TFscan}{
+				\pgfmathint{#1 - 1}
+				\pgfplotstableforeachcolumn{\TFscan}\as{\col}{
+					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
+					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+				}
+				\def\xshift{0pt}
+				\ifcase\pgfmathresult\relax
+				\or\or\or\or\or\or\or
+					\def\xshift{.3\baselineskip}
+				\or
+					\def\xshift{-.3\baselineskip}
+				\or\or
+					\def\xshift{-\baselineskip}
+				\fi
+				\edef\thisTF{
+					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller, yshift = \xshift] at (\thiscenter, \noexpand\ymax) {\thisid};
+				}
+				\thisTF
+			}
+						
+			\legend{dark, light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer \segment{B} segment,
+			axis limits = AB80 B,
+			shade overlap B = AB80
+		]
+		
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_AB80_B_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_AB80_B_lines.tsv};
+			
+			\foreachtablerow{\TFscan}{
+				\pgfmathint{#1 - 1}
+				\pgfplotstableforeachcolumn{\TFscan}\as{\col}{
+					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
+					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+				}
+				\def\xshift{0pt}
+				\ifcase\pgfmathresult\relax
+				\or\or\or\or\or\or\or
+					\def\xshift{.3\baselineskip}
+				\or
+					\def\xshift{-.3\baselineskip}
+				\or\or\or\or\or
+					\def\xshift{-.25\baselineskip}
+				\fi
+				\edef\thisTF{
+					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller, yshift = \xshift] at (\thiscenter, \noexpand\ymax) {\thisid};
+				}
+				\thisTF
+			}
+		
+	\end{hgroupplot}
+	
+	
+	%%% mutation sensitivity (positional mean) Cab-1
+	\coordinate[yshift = -\columnsep] (Cab-1) at (AB80 |- xlabel.south);
+	
+	\pgfplotstableread{rawData/PEV_ld_TF-scan_Cab-1.tsv}{\TFscan}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(Cab-1)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_ld_mutSens_Cab-1_axes.tsv},
+		enlarge y limits = {value = .125, upper},
+		ytick = {-10, ..., 10},
+		ylabel = {$\log_2$(enhancer strength)},
+		title color = Cab-1,
+		zero line,
+		legend style = {anchor = south west, at = {(0, 0)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+	]{\textwidth}{2}{position}
+	
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer \segment{A} segment,
+			axis limits = Cab-1 A,
+			shade overlap A = Cab-1
+		]
+		
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_Cab-1_A_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_Cab-1_A_lines.tsv};
+			
+			\foreachtablerow{\TFscan}{
+				\pgfmathint{#1 - 1}
+				\pgfplotstableforeachcolumn{\TFscan}\as{\col}{
+					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
+					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+				}
+				\edef\thisTF{
+					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+				}
+				\thisTF
+			}
+						
+			\legend{dark, light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer \segment{B} segment,
+			axis limits = Cab-1 B,
+			shade overlap B = Cab-1
+		]
+		
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_Cab-1_B_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_Cab-1_B_lines.tsv};
+			
+			\foreachtablerow{\TFscan}{
+				\pgfmathint{#1 - 1}
+				\pgfplotstableforeachcolumn{\TFscan}\as{\col}{
+					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
+					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+				}
+				\edef\thisTF{
+					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+				}
+				\thisTF
+			}
+		
+	\end{hgroupplot}
+	
+	
+	%%% mutation sensitivity (positional mean) rbcS-E9
+	\coordinate[yshift = -\columnsep] (rbcS-E9) at (AB80 |- xlabel.south);
+	
+	\pgfplotstableread{rawData/PEV_ld_TF-scan_rbcS-E9.tsv}{\TFscan}
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(rbcS-E9)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_ld_mutSens_rbcS-E9_axes.tsv},
+		enlarge y limits = {value = .125, upper},
+		ytick = {-10, ..., 10},
+		ylabel = {$\log_2$(enhancer strength)},
+		title color = rbcS-E9,
+		zero line,
+		legend style = {anchor = south west, at = {(0, 0)}},
+		legend image post style = {very thick},
+		legend plot pos = left,
+		legend cell align = left,
+	]{\textwidth}{2}{position}
+	
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer \segment{A} segment,
+			axis limits = rbcS-E9 A,
+			shade overlap A = rbcS-E9
+		]
+			
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_rbcS-E9_A_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_rbcS-E9_A_lines.tsv};
+			
+			\foreachtablerow{\TFscan}{
+				\pgfmathint{#1 - 1}
+				\pgfplotstableforeachcolumn{\TFscan}\as{\col}{
+					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
+					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+				}
+				\edef\thisTF{
+					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+				}
+				\thisTF
+			}
+						
+			\legend{dark, light}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer \segment{B} segment,
+			axis limits = rbcS-E9 B,
+			shade overlap B = rbcS-E9
+		]
+			
+			\addplot[line plot, dark] table [x = position, y = dark] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv};
+			\addplot[line plot, light] table [x = position, y = light] {rawData/PEV_ld_mutSens_rbcS-E9_B_lines.tsv};
+			
+			\foreachtablerow{\TFscan}{
+				\pgfmathint{#1 - 1}
+				\pgfplotstableforeachcolumn{\TFscan}\as{\col}{
+					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
+					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
+				}
+				\edef\thisTF{
+					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+				}
+				\thisTF
+			}
+		
+	\end{hgroupplot}
+	
+	
+	%%% transcription factor legend
+	\coordinate[yshift = -\columnsep] (TF legend) at (AB80 |- xlabel.south);
+	
+	\node[anchor = north west, xshift = \columnsep, inner sep = 0pt] at (TF legend) {%
+		\rowcolors{2}{white}{gray!20}%
+		\setlength{\tabcolsep}{3pt}%
+		\pgfplotstabletypeset[
+			begin table = {\begin{tabularx}{\textwidth - \columnsep}},
+			end table = {\end{tabularx}},
+			every head row/.style = {before row = \toprule, after row = \midrule},
+			every last row/.style = {after row = \bottomrule},
+			extra space/.style = {column type = X},
+			string type,
+			columns = {ID, family, consensus, ID, family, consensus},
+			display columns/0/.style = {select equal part entry of = {0}{2}},
+			display columns/1/.style = {select equal part entry of = {0}{2}},
+			display columns/2/.style = {select equal part entry of = {0}{2}, extra space},
+			display columns/3/.style = {select equal part entry of = {1}{2}},
+			display columns/4/.style = {select equal part entry of = {1}{2}},
+			display columns/5/.style = {select equal part entry of = {1}{2}},
+			assign column name/.style = {/pgfplots/table/column name={\textbf{#1}}},
+			column type = l,
+		]{rawData/PEV_ld_TF-scan_legend.tsv}%
+	};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{AB80}
+	\subfiglabel{Cab-1}
+	\subfiglabel{rbcS-E9}
+	\subfiglabel{TF legend}
+
+\end{tikzpicture}

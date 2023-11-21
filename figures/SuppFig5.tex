@@ -1,0 +1,297 @@
+\begin{tikzpicture}
+	\addtolength{\plotylabelwidth}{.5\baselineskip}
+	\setlength{\plotheight}{6.6cm}
+
+	%%% heatmap AB80 (light/dark)
+	\coordinate (AB80) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt] (ptitle) at (AB80) {\vphantom{\enhancer{AB80} enhancer \segment{A} segment}};
+	
+	\distance{ptitle.south}{ptitle.north}
+
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(AB80)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_ld_heatmap_AB80_axes.tsv},
+		xtick = {1, 20, 40, ..., 300},
+		title color = AB80,
+		heatmap,
+	]{\textwidth - \ydistance}{\plotheight}{2}{4}{position}{}
+			
+		\nextgroupplot [
+			title = \enhancer{AB80} enhancer \segment{A} segment,
+			axis limits = AB80 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_AB80_A_light_ins.tsv}
+			
+			
+		\nextgroupplot [
+			title = \enhancer{AB80} enhancer \segment{B} segment,
+			axis limits = AB80 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_AB80_B_light_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = AB80 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_AB80_A_light_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_AB80_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = AB80 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_AB80_B_light_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_AB80_wt.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = AB80 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_AB80_A_dark_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = AB80 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_AB80_B_dark_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = AB80 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_AB80_A_dark_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_AB80_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = AB80 B,
+			height = 10/9 * \plotheight,
+			colorbar heatmap
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_AB80_B_dark_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_AB80_wt.tsv}
+
+	\end{hvgroupplot}
+	
+	\distance{group c2r2.south}{group c2r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r1.north east) {\light};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r3.north east) {\dark};
+	
+	
+	%%% heatmap Cab-1 (light/dark)
+	\coordinate[yshift = -\columnsep] (Cab-1) at (AB80 |- plot xlabel.south);
+	
+	\distance{ptitle.south}{ptitle.north}
+
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(Cab-1)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_ld_heatmap_Cab-1_axes.tsv},
+		xtick = {1, 20, 40, ..., 300},
+		title color = Cab-1,
+		heatmap,
+	]{\textwidth - \ydistance}{\plotheight}{2}{4}{position}{}
+			
+		\nextgroupplot [
+			title = \enhancer{Cab-1} enhancer \segment{A} segment,
+			axis limits = Cab-1 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_Cab-1_A_light_ins.tsv}
+			
+			
+		\nextgroupplot [
+			title = \enhancer{Cab-1} enhancer \segment{B} segment,
+			axis limits = Cab-1 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_Cab-1_B_light_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = Cab-1 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_Cab-1_A_light_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_Cab-1_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = Cab-1 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_Cab-1_B_light_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_Cab-1_wt.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = Cab-1 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_Cab-1_A_dark_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = Cab-1 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_Cab-1_B_dark_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = Cab-1 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_Cab-1_A_dark_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_Cab-1_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = Cab-1 B,
+			height = 10/9 * \plotheight,
+			colorbar heatmap
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_Cab-1_B_dark_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_Cab-1_wt.tsv}
+
+	\end{hvgroupplot}
+	
+	\distance{group c2r2.south}{group c2r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r1.north east) {\light};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r3.north east) {\dark};
+	
+	
+	%%% heatmap rbcS-E9-1 (light/dark)
+	\coordinate[yshift = -\columnsep] (rbcS-E9) at (AB80 |- plot xlabel.south);
+	
+	\distance{ptitle.south}{ptitle.north}
+
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(rbcS-E9)}, xshift = \plotylabelwidth},
+		axis limits from table = {rawData/PEV_ld_heatmap_rbcS-E9_axes.tsv},
+		xtick = {1, 20, 40, ..., 300},
+		title color = rbcS-E9,
+		heatmap,
+	]{\textwidth - \ydistance}{\plotheight}{2}{4}{position}{}
+			
+		\nextgroupplot [
+			title = \enhancer{rbcS-E9} enhancer \segment{A} segment,
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_rbcS-E9_A_light_ins.tsv}
+			
+			
+		\nextgroupplot [
+			title = \enhancer{rbcS-E9} enhancer \segment{B} segment,
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_rbcS-E9_B_light_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_rbcS-E9_A_light_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_rbcS-E9_B_light_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_rbcS-E9_wt.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = insertion,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_rbcS-E9_A_dark_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 8/9 * \plotheight
+		]
+		
+			\heatmapIns{rawData/PEV_ld_heatmap_rbcS-E9_B_dark_ins.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 A,
+			ylabel = {substitution\\[-.1\baselineskip]or deletion},
+			height = 10/9 * \plotheight
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_rbcS-E9_A_dark_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_rbcS-E9_WT.tsv}
+			
+			
+		\nextgroupplot [
+			axis limits = rbcS-E9 B,
+			height = 10/9 * \plotheight,
+			colorbar heatmap
+		]
+		
+			\heatmapSubDel{rawData/PEV_ld_heatmap_rbcS-E9_B_dark_sub+del.tsv}
+			\heatmapWT{rawData/PEV_ld_heatmap_rbcS-E9_wt.tsv}
+
+	\end{hvgroupplot}
+	
+	\distance{group c2r2.south}{group c2r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r1.north east) {\light};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] at (group c2r3.north east) {\dark};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{AB80}
+	\subfiglabel{Cab-1}
+	\subfiglabel{rbcS-E9}
+
+\end{tikzpicture}
