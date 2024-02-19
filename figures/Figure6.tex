@@ -226,8 +226,37 @@
 	\end{hgroupplot}
 	
 	
+	%%% schematic of fragments/fragment combinations with different spacing
+	% native spacing
+	\coordinate[yshift = -\columnsep] (scheme spacing 1) at (n frags |- xlabel.south);
+	
+	\coordinate[shift = {(\columnsep, -.5)}] (construct bc) at (scheme spacing 1);
+	\node[anchor = west] (label bc) at (construct bc) {\textbf{bc} (native spacing):};
+	\PEFconstruct*{label bc.east}{AB80/bc}
+	
+	\draw[line width = \baselineskip, AB80!25, -Triangle Cap] ($(c1)!.5!(c2)$) ++(-2, -.66) coordinate (enh) -- ++(3, 0) node[pos = 0, anchor = west, text = black] {AB80};
+	\draw[line width = \baselineskip, AB80, opacity = .25] (enh) ++(1.5, 0) coordinate (b start) -- ++(.58, 0) coordinate (b end) node[pos = .5, text = black, font = \bfseries\vphantom{abcdectrl}, text opacity = 1]  {b};
+	\draw[line width = \baselineskip, AB80, opacity = .25] (enh) ++(2.5, 0) coordinate (c end) -- ++(-.58, 0) coordinate (c start) node[pos = .5, text = black, font = \bfseries\vphantom{abcdectrl}, text opacity = 1]  {c};
+	
+	\draw[thin, line cap = round] (c1) ++(.2, -.125) -- ($(b start) + (0, .5\baselineskip)$) (c2) ++(-.2, -.125) -- ($(c end) + (0, .5\baselineskip)$);
+	
+	% altered spacing
+	\coordinate (scheme spacing 2) at (scheme spacing 1 -| \textwidth - \twocolumnwidth, 0);
+	
+	\coordinate[xshift = \columnsep] (construct b+c) at (construct bc -| scheme spacing 2);
+	\node[anchor = west] (label b+c) at (construct b+c) {\textbf{b+c} (altered spacing):};
+	\PEFconstruct*{label b+c.east}{AB80/b,AB80/c}
+	
+	\draw[line width = \baselineskip, AB80!25, -Triangle Cap] ($(c1)!.5!(c2)$) ++(-2, -.66) coordinate (enh) -- ++(3, 0) node[pos = 0, anchor = west, text = black] {AB80};
+	\draw[line width = \baselineskip, AB80, opacity = .25] (enh) ++(1.5, 0) coordinate (b start) -- ++(.58, 0) coordinate (b end) node[pos = .5, text = black, font = \bfseries\vphantom{abcdectrl}, text opacity = 1]  {b};
+	\draw[line width = \baselineskip, AB80, opacity = .25] (enh) ++(2.5, 0) coordinate (c end) -- ++(-.58, 0) coordinate (c start) node[pos = .5, text = black, font = \bfseries\vphantom{abcdectrl}, text opacity = 1]  {c};
+	
+	\draw[thin, line cap = round] (c1) ++(.2, -.125) -- ($(b start) + (0, .5\baselineskip)$) ($(c1)!.5!(c2)$) ++(-.05, -.125) -- ($(b end) + (0, .5\baselineskip)$);
+	\draw[thin, line cap = round] ($(c1)!.5!(c2)$) ++(.05, -.125) -- ($(c start) + (0, .5\baselineskip)$) (c2) ++(-.2, -.125) -- ($(c end) + (0, .5\baselineskip)$);
+	
+	
 	%%% Examples of fragments and fragment combinations (light)
-	\coordinate[yshift = -\columnsep] (frags light) at (n frags |- xlabel.south);
+	\coordinate[yshift = -\columnsep - .5\baselineskip] (frags light) at (scheme spacing 1 |- enh);
 	
 	\distance{title.south}{title.north}
 	
@@ -344,6 +373,8 @@
 	\subfiglabel{overview}
 	\subfiglabel{n frags}
 	\subfiglabel{AUC}
+	\subfiglabel{scheme spacing 1}
+	\subfiglabel{scheme spacing 2}
 	\subfiglabel{frags light}
 	\subfiglabel{frags dark}
 	\subfiglabel{order}

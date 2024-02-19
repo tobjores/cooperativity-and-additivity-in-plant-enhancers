@@ -43,6 +43,24 @@
 	\node[anchor = north, font = \bfseries\vphantom{abcdectrl}, inner sep = .15em, yshift = #1 * \baselineskip, fill = #4, fill opacity = .5, text opacity = 1, minimum width = #3 * \pgfplotsunitxlength] (#4 #5) at (#2, \ymin) {#5};
 }
 
+%% colorbar for distance between deletions in PEVdouble
+	\pgfplotsset{
+		colorbar distance/.style = {
+			colorbar horizontal,
+			colorbar style = {
+				anchor = south west,
+				at = {(.025, .025)},
+				height = .25cm,
+				width = .4 * \pgfkeysvalueof{/pgfplots/parent axis height},
+				tick pos = upper,
+				xticklabel pos = right,
+				xticklabel style = {node font = \figtiny, inner ysep = .1em, text depth = 0pt},
+				title = distance (bp)\\\vphantom{1},
+				title style = {fill = none, draw = none, minimum width = 0, node font = \figsmall, align = center, anchor = south},
+				extra x ticks = {8},
+			},
+		}
+	}
 
 %%% general setup
 \usepgfplotslibrary{statistics, groupplots, colormaps}
@@ -497,7 +515,7 @@
 }
 
 
-%% significance for all pairs (especially usefull for half violin plots or plots with selected pvalues only)
+%% significance for all pairs (especially usefull for half plots or plots with selected pvalues only)
 % usage: \signifall(*)[pgf options]{file}
 \makeatletter
 	\newcommand{\signifall}{%

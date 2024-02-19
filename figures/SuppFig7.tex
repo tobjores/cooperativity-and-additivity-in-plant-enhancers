@@ -36,12 +36,22 @@
 				}
 				\def\xshift{0pt}
 				\ifcase\pgfmathresult\relax
-				\or\or\or\or\or\or\or
+				\or\or
 					\def\xshift{.3\baselineskip}
 				\or
 					\def\xshift{-.3\baselineskip}
+				\or\or\or
+					\def\xshift{.125\baselineskip}
+				\or
+					\def\xshift{-.125\baselineskip}
 				\or\or
-					\def\xshift{-\baselineskip}
+					\def\xshift{.225\baselineskip}
+				\or
+					\def\xshift{.025\baselineskip}
+				\or\or
+					\def\xshift{-.5\baselineskip}
+				\or\or
+					\def\xshift{-.5\baselineskip}
 				\fi
 				\edef\thisTF{
 					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
@@ -70,12 +80,20 @@
 				}
 				\def\xshift{0pt}
 				\ifcase\pgfmathresult\relax
-				\or\or\or\or\or\or\or
-					\def\xshift{.3\baselineskip}
+				\or\or\or\or\or\or
+					\def\xshift{.125\baselineskip}
 				\or
-					\def\xshift{-.3\baselineskip}
-				\or\or\or\or\or
-					\def\xshift{-.25\baselineskip}
+					\def\xshift{-.125\baselineskip}
+				\or\or
+					\def\xshift{.225\baselineskip}
+				\or
+					\def\xshift{.025\baselineskip}
+				\or\or
+					\def\xshift{-.5\baselineskip}
+				\or\or\or\or
+					\def\xshift{.025\baselineskip}
+				\or
+					\def\xshift{-.025\baselineskip}
 				\fi
 				\edef\thisTF{
 					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
@@ -88,7 +106,7 @@
 	
 	
 	%%% mutation sensitivity (positional mean) Cab-1
-	\coordinate[yshift = -\columnsep] (Cab-1) at (AB80 |- xlabel.south);
+	\coordinate[yshift = -.6\columnsep] (Cab-1) at (AB80 |- xlabel.south);
 	
 	\pgfplotstableread{rawData/PEV_ld_TF-scan_Cab-1.tsv}{\TFscan}
 	
@@ -121,9 +139,18 @@
 					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
 					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
 				}
+				\def\xshift{0pt}
+				\ifcase\pgfmathresult\relax
+				\or\or
+					\def\xshift{.075\baselineskip}
+				\or
+					\def\xshift{-.075\baselineskip}
+				\or\or
+					\def\xshift{-.5\baselineskip}
+				\fi
 				\edef\thisTF{
 					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
-					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller, yshift = \xshift] at (\thiscenter, \noexpand\ymax) {\thisid};
 				}
 				\thisTF
 			}
@@ -157,7 +184,7 @@
 	
 	
 	%%% mutation sensitivity (positional mean) rbcS-E9
-	\coordinate[yshift = -\columnsep] (rbcS-E9) at (AB80 |- xlabel.south);
+	\coordinate[yshift = -.6\columnsep] (rbcS-E9) at (AB80 |- xlabel.south);
 	
 	\pgfplotstableread{rawData/PEV_ld_TF-scan_rbcS-E9.tsv}{\TFscan}
 	
@@ -190,9 +217,20 @@
 					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
 					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
 				}
+				\def\xshift{0pt}
+				\ifcase\pgfmathresult\relax
+				\or
+					\def\xshift{.6\baselineskip}
+				\or\or
+					\def\xshift{-.4\baselineskip}
+				\or\or\or\or\or\or
+					\def\xshift{.1\baselineskip}
+				\or
+					\def\xshift{-.25\baselineskip}
+				\fi
 				\edef\thisTF{
 					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
-					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller, yshift = \xshift] at (\thiscenter, \noexpand\ymax) {\thisid};
 				}
 				\thisTF
 			}
@@ -215,9 +253,16 @@
 					\pgfplotstablegetelem{\pgfmathresult}{\col}\of{\TFscan}
 					\expandafter\edef\csname this\col\endcsname{\pgfplotsretval}
 				}
+				\def\xshift{0pt}
+				\ifcase\pgfmathresult\relax
+				\or\or\or\or\or\or\or\or\or
+					\def\xshift{.1\baselineskip}
+				\or
+					\def\xshift{-.25\baselineskip}
+				\fi
 				\edef\thisTF{
 					\noexpand\fill[black, fill opacity = .1] (\thisstart, \noexpand\ymax) rectangle (\thisstop, \noexpand\ymin);
-					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller] at (\thiscenter, \noexpand\ymax) {\thisid};
+					\noexpand\node[anchor = east, rotate = 90, node font = \noexpand\figsmaller, yshift = \xshift] at (\thiscenter, \noexpand\ymax) {\thisid};
 				}
 				\thisTF
 			}
@@ -226,7 +271,7 @@
 	
 	
 	%%% transcription factor legend
-	\coordinate[yshift = -\columnsep] (TF legend) at (AB80 |- xlabel.south);
+	\coordinate[yshift = -.6\columnsep] (TF legend) at (AB80 |- xlabel.south);
 	
 	\node[anchor = north west, xshift = \columnsep, inner sep = 0pt] at (TF legend) {%
 		\rowcolors{2}{white}{gray!20}%

@@ -530,3 +530,20 @@ xlsx_2digit <- createStyle(numFmt = '0.00')
 xlsx_seq_font <- createStyle(fontName = 'Courier New')
 xlsx_boldwrap <- createStyle(textDecoration = 'bold', wrapText = TRUE)
 xlsx_center <- createStyle(halign = 'center')
+
+
+### function to make the the name of a supplemental data set bold
+# wb:   Workbook object; the workbook to format
+# id:   numeric or character; the number of the current supplemental data set
+makeNameBold <- function(wb, id) {
+  # make the data set name bold
+  for (i in grep(paste0('Supplemental Data Set ', id), wb$sharedStrings, fixed = TRUE)) {
+    # insert additional formatting in shared string
+    wb$sharedStrings[[i]] <- gsub('<si>', '<si><r>', gsub('</si>', '</r></si>', wb$sharedStrings[[i]]))
+    wb$sharedStrings[[i]] <- gsub(
+      '(Supplemental Data Set [0-9]+)',
+      '</t></r><r><rPr><b val=\"true\"/></rPr><t xml:space=\"preserve\">\\1</t></r><r><t xml:space=\"preserve\">',
+      wb$sharedStrings[[i]]
+    )
+  }
+}

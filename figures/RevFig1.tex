@@ -1,0 +1,131 @@
+\begin{tikzpicture}
+	
+	%%% effect of mutations in TFBSs
+	\coordinate (effects) at (0, 0);
+	
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(effects)}, xshift = \plotylabelwidth + .25\baselineskip},
+		ymin = 0,
+		ymax = 100,
+		ytick = {0, 20, ..., 100},
+		enlarge y limits = {upper, value = 0.3},
+%		legend style = {anchor = south east, at = {(1, 0)}},
+%		legend image post style = {fill opacity = 1, mark size = 1.25},
+%		legend plot pos = right,
+%		legend cell align = right,
+		ylabel = {percent of mutations},
+		xticklabel style = {rotate = 90, anchor = east, xshift = -.3333em},
+		group/every plot/.append style = {x grids = false},
+	]{\textwidth - .75\fourcolumnwidth - \columnsep - .25\baselineskip}{2}{}
+	
+		\nextgroupplot[
+			title = mutagenesis,
+			width = 22.4 / 39.4 * \plotwidth,
+			title style = {minimum width = 22.4 / 39.4 * \plotwidth},
+			x tick table = {rawData/PEV_effect_directions_mutagenesis_bars.tsv}{TF}
+		]
+		
+			\addplot[
+				ybar stacked,
+				bar width = .8,
+				draw = black,
+				fill = RoyalBlue1,
+				fill opacity = .5
+			] table [x = id, y = p_decreased] {rawData/PEV_effect_directions_mutagenesis_bars.tsv};
+			
+			\addplot[
+				ybar stacked,
+				bar width = .8,
+				draw = black,
+				fill = IndianRed1,
+				fill opacity = .5
+			] table [x = id, y = p_increased] {rawData/PEV_effect_directions_mutagenesis_bars.tsv};
+			
+			\addplot[
+				draw = none,
+				visualization depends on = value \thisrow{n_decreased} \as \decreased,
+				visualization depends on = value \thisrow{n_increased} \as \increased,
+				nodes near coords = {\textcolor{RoyalBlue1}{\decreased}/\textcolor{IndianRed1}{\increased}},
+				nodes near coords style = {anchor = west, rotate = 90, node font = \figsmall}
+			] table [x = id, y expr = 100] {rawData/PEV_effect_directions_mutagenesis_bars.tsv};
+			
+			
+		\nextgroupplot[
+			title = scanning,
+			width = 56.4 / 39.4 * \plotwidth,
+			title style = {minimum width = 56.4 / 39.4 * \plotwidth},
+			x tick table = {rawData/PEV_effect_directions_scanning_bars.tsv}{TF}
+		]
+		
+			\addplot[
+				ybar stacked,
+				bar width = .8,
+				draw = black,
+				fill = RoyalBlue1,
+				fill opacity = .5
+			] table [x = id, y = p_decreased] {rawData/PEV_effect_directions_scanning_bars.tsv};
+			
+			\addplot[
+				ybar stacked,
+				bar width = .8,
+				draw = black,
+				fill = IndianRed1,
+				fill opacity = .5
+			] table [x = id, y = p_increased] {rawData/PEV_effect_directions_scanning_bars.tsv};
+			
+			\addplot[
+				draw = none,
+				visualization depends on = value \thisrow{n_decreased} \as \decreased,
+				visualization depends on = value \thisrow{n_increased} \as \increased,
+				nodes near coords = {\textcolor{RoyalBlue1}{\decreased}/\textcolor{IndianRed1}{\increased}},
+				nodes near coords style = {anchor = west, rotate = 90, node font = \figsmall}
+			] table [x = id, y expr = 100] {rawData/PEV_effect_directions_scanning_bars.tsv};
+			
+			\node[rotate = 90, font = \figsmaller\bfseries, red] at (1, 64.865) {increasing};
+			\node[rotate = 90, font = \figsmaller\bfseries, blue] at (28, 50) {decreasing};
+			
+	\end{hgroupplot}
+	
+	
+	%%% summary
+	\coordinate (summary) at (effects -| \textwidth - .75\fourcolumnwidth, 0);
+	
+	\distance{group c1r1.south}{title.north}
+	
+	\begin{axis}[%
+		anchor = north west,
+		at = {(summary)},
+		width = .75\fourcolumnwidth - \plotylabelwidth - \baselineskip,
+		height = \ydistance,
+		xshift = \plotylabelwidth + \baselineskip,
+		x grids = false,
+		axis limits from table = {rawData/PEV_effect_directions_summary_axes.tsv},
+		ylabel = percent decreasing mutations,
+		x tick table = {rawData/PEV_effect_directions_summary_boxplot.tsv}{sample},
+		xticklabel style = {rotate = 90, anchor = east, xshift = -.3333em}
+	]
+	
+		% lines for random samples
+		\pgfplotstableforeachcolumnelement{percent}\of{rawData/PEV_effect_directions_summary_lines.tsv}\as\percent{
+			\pgfplotstablegetelem{\pgfplotstablerow}{linetype}\of{rawData/PEV_effect_directions_summary_lines.tsv}
+			\edef\thisline{\noexpand\draw[\pgfplotsretval, red, thick] (\noexpand\xmin, \percent) -- (\noexpand\xmax, \percent);}
+			\thisline
+		}
+
+		% boxplots
+		\boxplots{%
+			fill = gray,
+			fill opacity = .5
+		}{rawData/PEV_effect_directions_summary}
+		
+		% add sample size
+		\samplesize{rawData/PEV_effect_directions_summary_boxplot.tsv}{id}{n}
+
+	\end{axis}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{effects}
+	\subfiglabel{summary}
+	
+\end{tikzpicture}

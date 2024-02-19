@@ -1,0 +1,277 @@
+\begin{tikzpicture}
+	
+	%%% effect of two deletions in light
+	\coordinate (prediction light) at (0, 0);
+	
+	\node[anchor = north west, text depth = 0pt, font = \hphantom{A}] (ptitle) at (prediction light) {\vphantom{\light}};
+	
+	\distance{ptitle.south}{ptitle.north}
+	
+	\pgfmathsetlength{\templength}{(\textwidth + \pgflinewidth - 2\plotylabelwidth - 2\groupplotsep - 2\ydistance - \columnsep) / 4}
+	
+	\begin{hvgroupplot}[%
+		group position = {anchor = above north west, at = {(prediction light)}, xshift = \plotylabelwidth},
+		enlargelimits = .05,
+		zero line,
+		show diagonal,
+		colormap name = viridis,
+		colorbar distance,
+	]{3\templength + \plotylabelwidth + 2\groupplotsep}{10.5cm + \plotxlabelheight + 2\groupplotsep}{3}{3}{\textbf{additive model}: $\log_2$(enhancer strength)}{\textbf{measurement}: $\log_2$(enhancer strength)}
+		
+		\nextgroupplot[
+			title = \enhancer{AB80} enhancer\\\segment{B} segment,
+			title color = AB80,
+			axis limits from table = {rawData/PEVdouble_prediction_AB80_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 0 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_AB80_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_AB80_light_0}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{Cab-1} enhancer\\\segment{B} segment,
+			title color = Cab-1,
+			axis limits from table = {rawData/PEVdouble_prediction_Cab-1_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 0 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_Cab-1_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_Cab-1_light_0}
+			
+			
+		\nextgroupplot[
+			title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+			title color = rbcS-E9,
+			axis limits from table = {rawData/PEVdouble_prediction_rbcS-E9_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 0 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_light_0}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEVdouble_prediction_AB80_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 1 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_AB80_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_AB80_light_1}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEVdouble_prediction_Cab-1_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 1 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_Cab-1_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_Cab-1_light_1}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEVdouble_prediction_rbcS-E9_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 1 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_light_1}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEVdouble_prediction_AB80_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 2 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_AB80_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_AB80_light_2}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEVdouble_prediction_Cab-1_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 2 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_Cab-1_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_Cab-1_light_2}
+			
+			
+		\nextgroupplot[
+			axis limits from table = {rawData/PEVdouble_prediction_rbcS-E9_light_axes.tsv}
+		]
+		
+			% scatter plot
+			\addplot [
+				scatter,
+				only marks,
+				mark = solido,
+				fill opacity = .5,
+				point meta = explicit,
+				x filter/.expression = {\thisrow{in_TF} == 2 ? x : NaN}
+			] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_light_points.tsv};
+			
+			% correlation
+			\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_light_2}
+		
+	\end{hvgroupplot}
+	
+	\distance{group c3r1.south}{group c3r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c3r1.north east) {0 deletions in TFBS};
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c3r2.north east) {1 deletion in TFBS};
+	\node[anchor = south west, rotate = -90, draw = black, fill = light!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c3r3.north east) {2 deletions in TFBS};
+	
+	
+	%%% effect of two deletions in dark
+	\coordinate[xshift = \columnsep] (prediction dark) at (group c3r1.above north -| tlight.north);
+	
+	\begin{vgroupplot}[%
+		group position = {anchor = above north west, at = {(prediction dark)}, xshift = \plotylabelwidth},
+		width = \templength,
+		axis limits from table = {rawData/PEVdouble_prediction_rbcS-E9_dark_axes.tsv},
+		enlargelimits = .05,
+		zero line,
+		show diagonal,
+		xlabel = \textbf{additive model}:\\$\log_2$(enhancer strength),
+		colormap name = viridis,
+		colorbar distance,
+		point meta min = 8
+	]{10.5cm + \plotxlabelheight + 2\groupplotsep}{3}{\textbf{measurement}: $\log_2$(enhancer strength)}
+		
+			\nextgroupplot[
+				title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+				title color = rbcS-E9,
+				title style = {minimum width = \templength}
+			]
+		
+				% scatter plot
+				\addplot [
+					scatter,
+					only marks,
+					mark = solido,
+					fill opacity = .5,
+					point meta = explicit,
+					x filter/.expression = {\thisrow{in_TF} == 0 ? x : NaN}
+				] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_dark_points.tsv};
+				
+				% correlation
+				\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_dark_0}
+				
+				
+			\nextgroupplot
+		
+				% scatter plot
+				\addplot [
+					scatter,
+					only marks,
+					mark = solido,
+					fill opacity = .5,
+					point meta = explicit,
+					x filter/.expression = {\thisrow{in_TF} == 1 ? x : NaN}
+				] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_dark_points.tsv};
+				
+				% correlation
+				\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_dark_1}
+				
+				
+			\nextgroupplot
+		
+				% scatter plot
+				\addplot [
+					scatter,
+					only marks,
+					mark = solido,
+					fill opacity = .5,
+					point meta = explicit,
+					x filter/.expression = {\thisrow{in_TF} == 2 ? x : NaN}
+				] table[x = prediction, y = enrichment, meta = distance] {rawData/PEVdouble_prediction_rbcS-E9_dark_points.tsv};
+				
+				% correlation
+				\stats[stats position = south east]{rawData/PEVdouble_prediction_rbcS-E9_dark_2}
+		
+	\end{vgroupplot}
+	
+	\distance{group c1r1.south}{group c1r1.north}
+	
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c1r1.north east) {0 deletions in TFBS};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c1r2.north east) {1 deletion in TFBS};
+	\node[anchor = south west, rotate = -90, draw = black, fill = dark!20, minimum width = \ydistance, shift = {(-.5\pgflinewidth, -.5\pgflinewidth)}, text depth = 0pt, font = \hphantom{A}] (tlight) at (group c1r3.north east) {2 deletions in TFBS};
+	
+	
+	%%% subfigure labels
+	\subfiglabel{prediction light}
+	\subfiglabel{prediction dark}
+	
+\end{tikzpicture}

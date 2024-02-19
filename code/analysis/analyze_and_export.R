@@ -15,6 +15,9 @@ source('code/analysis/export_functions.R')
 export_dir <- 'figures/rawData/'
 supp_data_dir <- 'data/supplemental_data/'
 
+paper_ref <- '' # update once we have a DOI (e.g. "Plant Cell (2015). 10.1105/tpc.18.00001.")
+paper_id <- str_split_1(paper_ref, fixed('.')) |> tail(2) |> head(1)
+
 
 ### load data ###
 sapply(dir(path = 'data/RData/', pattern = '*.Rdata', full.names = TRUE), load, environment())
@@ -617,13 +620,21 @@ addWorksheet(wb, sheetName = 'single-nucleotide variants (ld)')
 writeData(
   wb,
   sheet = 1,
-  paste0('Supplemental Data Set ', DS_id,'. Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
+  paste('Supplemental Data. Jores et al.', paper_ref),
   startCol = 1,
   startRow = 1
 )
 
-addStyle(wb, sheet = 1, style = xlsx_bold, cols = 1, rows = 1)
-mergeCells(wb, sheet = 1, rows = 1, cols = seq_len(ncol(data_table)))
+writeData(
+  wb,
+  sheet = 1,
+  paste0('Supplemental Data Set ', DS_id,' Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
+  startCol = 1,
+  startRow = 3
+)
+
+makeNameBold(wb, DS_id)
+mergeCells(wb, sheet = 1, rows = 3, cols = seq_len(ncol(data_table)))
 
 writeData(
   wb,
@@ -635,12 +646,12 @@ writeData(
     "and normalized to the wild-type variant (log2 set to 0)."
   ),
   startCol = 1,
-  startRow = 2
+  startRow = 4
 )
 
-addStyle(wb, sheet = 1, style = xlsx_wrap, rows = 2, cols = 1)
-mergeCells(wb, sheet = 1, rows = 2, cols = seq_len(ncol(data_table)))
-setRowHeights(wb, sheet = 1, rows = 2, heights = 12.5 * 3)
+addStyle(wb, sheet = 1, style = xlsx_wrap, rows = 4, cols = 1)
+mergeCells(wb, sheet = 1, rows = 4, cols = seq_len(ncol(data_table)))
+setRowHeights(wb, sheet = 1, rows = 4, heights = 12.5 * 3)
 
 xlsx_header <- names(data_table)
 enrichment_ids <- which(xlsx_header %in% c('light', 'dark'))
@@ -651,37 +662,37 @@ writeData(
   sheet = 1,
   matrix(xlsx_header, nrow = 1),
   startCol = 1,
-  startRow = 4,
+  startRow = 6,
   colNames = FALSE
 )
 
-addStyle(wb, sheet = 1, style = xlsx_boldwrap, cols = seq_along(xlsx_header), rows = 4)
+addStyle(wb, sheet = 1, style = xlsx_boldwrap, cols = seq_along(xlsx_header), rows = 6)
 
 writeData(
   wb,
   sheet = 1,
   data_table,
   startCol = 1,
-  startRow = 5,
+  startRow = 7,
   headerStyle = xlsx_bold,
   keepNA = TRUE
 )
 
-mergeCells(wb, sheet = 1, rows = 4, cols = enrichment_ids)
-addStyle(wb, sheet = 1, style = xlsx_center, rows = 4, cols = enrichment_ids, stack = TRUE)
+mergeCells(wb, sheet = 1, rows = 6, cols = enrichment_ids)
+addStyle(wb, sheet = 1, style = xlsx_center, rows = 6, cols = enrichment_ids, stack = TRUE)
 
 for (i in seq_along(xlsx_header)[-enrichment_ids]) {
-  mergeCells(wb, sheet = 1, rows = 4:5, cols = i)
+  mergeCells(wb, sheet = 1, rows = 6:7, cols = i)
 }
 
-addStyle(wb, sheet = 1, style = xlsx_2digit, cols = enrichment_ids, rows = 6:(nrow(data_table) + 6), gridExpand = TRUE)
-addStyle(wb, sheet = 1, style = xlsx_seq_font, cols = which(xlsx_header == 'sequence'), rows = 6:(nrow(data_table) + 6))
+addStyle(wb, sheet = 1, style = xlsx_2digit, cols = enrichment_ids, rows = 8:(nrow(data_table) + 8), gridExpand = TRUE)
+addStyle(wb, sheet = 1, style = xlsx_seq_font, cols = which(xlsx_header == 'sequence'), rows = 8:(nrow(data_table) + 8))
 
 setColWidths(wb, sheet = 1, cols = which(xlsx_header == 'unique'), widths = 19)
 
-freezePane(wb, sheet = 1, firstActiveRow = 6)
+freezePane(wb, sheet = 1, firstActiveRow = 8)
 
-saveWorkbook(wb, paste0(supp_data_dir, 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
+saveWorkbook(wb, paste0(supp_data_dir, if_else(paper_id == '', '', paste0('tpc', paper_id, '-')), 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
 
 
 ## scan enhancer sequences for transcription factor binding sites
@@ -691,16 +702,44 @@ FL_sequences <- enhancer_sequences |>
   deframe() |>
   Biostrings::DNAStringSet()
 
-TF_scan <- scan_sequences(TF_motifs, FL_sequences) |>
+TF_scan <- scan_sequences(TF_motifs, FL_sequences, RC = TRUE) |>
   as_tibble() |>
-  select(sequence, 'id' = motif.i, start, stop) |>
+  select(sequence, 'id' = motif.i, start, stop, strand) |>
   mutate(
     id = paste0('TF-', id),
+    orientation = if_else(strand == '+', 'fwd', 'rev'),
+    tmp = if_else(strand == '-', start, stop),
+    start = if_else(strand == '-', stop, start),
+    stop = tmp,
     start = start - 0.5,
     stop = stop + 0.5,
-    center = 0.5 * (start + stop)
+    center = 0.5 * (start + stop),
   ) |>
+  select(-strand, -tmp) |>
+  distinct(sequence, id, start, stop, center, .keep_all = TRUE) |>
   arrange(center)
+
+# number of mutation-sensitive regions with/without a contained TFBS
+TF_content <- function(enhancer, reg_start, reg_end) {
+  TF_scan |>
+    filter(sequence == enhancer) |>
+    mutate(
+      start = start + 0.5,
+      stop = stop - 0.5,
+      in_region = between(start, reg_start, reg_end) & between(stop, reg_start, reg_end)
+    ) |>
+    filter(in_region) |>
+    nrow()
+}
+
+enhancer_fragments |>
+  filter(nchar(fragment) == 1) |>
+  rowwise() |>
+  mutate(
+    TFBSs = TF_content(enhancer, start, end)
+  ) |>
+  ungroup() |>
+  count(TFBSs > 0)
 
 # export data
 for (enhancer in unique(TF_scan$sequence)) {
@@ -907,6 +946,247 @@ TF_hits_PWMs <- TF_hits_filtered |>
     motif = if_else(orientation == 'rev', motif_rc(TF_motifs[target.i]), TF_motifs[target.i]),
     LaTeX_PWM = list(PWM_to_LaTeX(motif, paste0(export_dir, 'seqLogo_TF-', target.i, '_', orientation, '.tsv')))
   )
+
+
+## correlation between variant enhancer strength and TF motif match
+# combine TF hits from the scanning and mutagenesis data approach
+TF_hits_pos <- TF_hits_filtered |>
+  filter(condition == 'light') |>
+  inner_join(
+    enhancer_fragments |> select(enhancer, 'region' = fragment, 'region_start' = start),
+    by = c('enhancer', 'region')
+  ) |>
+  mutate(
+    start = region_start + offset,
+    stop = start + length - 1,
+    start = start - 0.5,
+    stop = stop + 0.5,
+    center = 0.5 * (start + stop),
+    method = 'mutagenesis'
+  ) |>
+  select(enhancer, 'id' = target, start, stop, center, orientation, method) |>
+  bind_rows(
+    TF_scan |>
+      rename('enhancer' = sequence) |>
+      mutate(
+        id = str_replace(id, '-', '-cluster_'),
+        method = 'scanning'
+      )
+  )
+
+# calculate correlation
+cor_TF_match <- data_heatmap_PEV_ld |>
+  filter(type == 'substitution' & condition == 'light' & part == 'B') |>
+  inner_join(
+    TF_hits_pos,
+    join_by(enhancer, between(position, start, stop))
+  ) |>
+  group_by(method, enhancer, offset, id, start, stop, center, orientation) |>
+  group_modify(
+    ~ add_row(.x, type = 'WT', variant = 'WT', duplSeq = FALSE, enrichment = 0)
+  ) |>
+  ungroup() |>
+  inner_join(
+    enhancer_variants,
+    by = join_by(enhancer, type, variant, position, varNuc, offset, duplSeq)
+  ) |>
+  mutate(
+    start = start + 0.5,
+    stop = stop - 0.5,
+    across(c(start, stop), ~ .x - offset),
+    matched_seq = str_sub(sequence, start, stop),
+    matched_seq = if_else(orientation == 'rev', as.character(Biostrings::reverseComplement(Biostrings::DNAStringSet(matched_seq))), matched_seq)
+  ) |>
+  filter(start > 0) |>
+  group_by(id) |>
+  mutate(
+    match_score = score_match(filter_motifs(TF_motifs, name = id), matched_seq)
+  ) |>
+  group_by(method, enhancer, id, start, stop, center, orientation) |>
+  summarise(
+    pearson = cor(enrichment, match_score, use = 'complete.obs')
+  ) |>
+  ungroup() |>
+  mutate(
+    enhancer = ordered(enhancer, levels = c('AB80', 'Cab-1', 'rbcS-E9'))
+  )
+
+# export data
+for (meth in unique(cor_TF_match$method)) {
+  cor_TF_match |>
+    filter(method == meth) |>
+    arrange(enhancer) |>
+    mutate(
+      sample = paste0('points.', as.numeric(enhancer))
+    ) |>
+    group_by(enhancer) |>
+    mutate(
+      id = seq_len(n())
+    ) |>
+    ungroup() |>
+    select(id, sample, pearson) |>
+    pivot_wider(
+      names_from = sample,
+      values_from = pearson
+    ) |>
+    write_tsv(paste0(export_dir, 'PEV_cor_TF_match_', meth, '_points.tsv'))
+  
+  cor_TF_match |>
+    filter(method == meth) |>
+    group_by(enhancer) |>
+    summarise(
+      mean = mean(pearson)
+    ) |>
+    ungroup() |>
+    select(enhancer, mean) |>
+    mutate(
+      id = as.numeric(enhancer)
+    ) |>
+    arrange(id) |>
+    write_tsv(paste0(export_dir, 'PEV_cor_TF_match_', meth, '_mean.tsv'))
+}
+
+# export axis limits
+cor_TF_match |>
+  select('y' = pearson) |>
+  summarise(
+    across(y, list('min' = min, 'max' = max), .names = '{.col}{.fn}')
+  ) |>
+  write_tsv(paste0(export_dir, 'PEV_cor_TF_match_axes.tsv'))
+
+
+## consistency of mutation effect directions
+# prepare data
+data_TF_mutations <- TF_hits_pos |>
+  mutate(
+    start = start + 0.5,
+    stop = stop - 0.5
+  ) |>
+  inner_join(
+    data_heatmap_PEV_ld |>
+      filter(part == 'B' & condition == 'light' & ! duplSeq),
+    by = join_by(enhancer, between(y$position, x$start, x$stop))
+  ) |>
+  drop_na(enrichment) |>
+  unite(
+    'TF',
+    id,
+    center
+  ) |>
+  mutate(
+    TF = str_replace_all(TF, 'cluster_', ''),
+    TF = str_replace_all(TF, '_', '@')
+  )
+
+data_TF_mutations_count <- data_TF_mutations |>
+  mutate(
+    activity = if_else(enrichment > 0, 'increased', 'decreased')
+  ) |>
+  count(method, TF, activity) |>
+  group_by(method, TF) |>
+  mutate(
+    percent = n / sum(n) * 100,
+    order = percent[activity == 'decreased']
+  ) |>
+  ungroup() |>
+  arrange(order) |>
+  mutate(
+    TF = ordered(TF, levels = unique(TF))
+  )
+
+# export data
+for (met in unique(data_TF_mutations_count$method)) {
+  data_TF_mutations_count |>
+    filter(method == met) |>
+    select(TF, activity, n, 'p' = percent) |>
+    pivot_wider(
+      names_from = activity,
+      values_from = c(n, p)
+    ) |>
+    mutate(
+      across(-TF, ~ replace_na(.x, 0)),
+      id = as.numeric(droplevels(TF))
+    ) |>
+    write_tsv(paste0(export_dir, 'PEV_effect_directions_', met, '_bars.tsv'))
+}
+
+# export summary data
+data_summary <- data_TF_mutations_count |>
+  filter(activity == 'decreased') |>
+  mutate(
+    method = ordered(method, levels = c('mutagenesis', 'scanning'))
+  )
+
+LaTeX_boxplot(
+  data = data_summary,
+  samples_from = method,
+  values_from = percent,
+  file = paste0(export_dir, 'PEV_effect_directions_summary'),
+  p_values = FALSE
+)
+
+data_summary |>
+  rename(y = percent) |>
+  summarise(
+    across(y, c('min' = min, 'max' = max), .names = '{.col}{.fn}'),
+    yhelper = 0.05 * (ymax - ymin)
+  ) |>
+  ungroup() |>
+  mutate(
+    ymin = ymin - 3 * yhelper,
+    ymax = ymax + yhelper
+  ) |>
+  select(-yhelper) |>
+  write_tsv(paste0(export_dir, 'PEV_effect_directions_summary_axes.tsv'))
+
+# sample random regions
+random <- vector('numeric', length = 100)
+
+for (i in seq_along(random)) {
+  set.seed(i)
+  
+  random_pos <- data_TF_mutations |>
+    group_by(enhancer, offset, method, TF) |>
+    summarise(
+      length = unique(stop - start + 1),
+      .groups = 'drop'
+    ) |>
+    group_by(enhancer) |>
+    mutate(
+      start = sample(seq(unique(offset), unique(offset + 168 - max(length))), n(), replace = TRUE),
+      stop = start + length - 1,
+      method = 'random'
+    )
+  
+  random[i] <- random_pos |>
+    inner_join(
+      data_heatmap_PEV_ld |>
+        filter(part == 'B' & condition == 'light' & ! duplSeq),
+      by = join_by(enhancer, between(y$position, x$start, x$stop))
+    ) |>
+    drop_na(enrichment) |>
+    mutate(
+      activity = if_else(enrichment > 0, 'increased', 'decreased')
+    ) |>
+    count(method, TF, activity) |>
+    group_by(method, TF) |>
+    filter(n() == 2) |>
+    mutate(
+      percent = n[activity == 'decreased'] / sum(n) * 100
+    ) |>
+    ungroup() |>
+    summarise(
+      percent = median(percent)
+    ) |>
+    pull(percent)
+}
+
+tibble(
+  sample = c('mean-sd', 'mean', 'mean+sd'),
+  percent = c(mean(random) - sd(random), mean(random), mean(random) + sd(random)),
+  linetype = c('dashed', 'solid', 'dashed')
+) |>
+  write_tsv(paste0(export_dir, 'PEV_effect_directions_summary_lines.tsv'))
 
 
 ## mean positional sensitivity to mutations
@@ -1541,12 +1821,20 @@ addWorksheet(wb, sheetName = 'single-nucleotide variants (cr)')
 writeData(
   wb,
   sheet = 1,
-  paste0('Supplemental Data Set ', DS_id,'. Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in time course experiment.'),
+  paste('Supplemental Data. Jores et al.', paper_ref),
   startCol = 1,
   startRow = 1
 )
 
-addStyle(wb, sheet = 1, style = xlsx_bold, rows = 1, cols = 1)
+writeData(
+  wb,
+  sheet = 1,
+  paste0('Supplemental Data Set ', DS_id,' Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in time course experiment.'),
+  startCol = 1,
+  startRow = 3
+)
+
+makeNameBold(wb, DS_id)
 mergeCells(wb, sheet = 1, rows = 3, cols = seq_len(ncol(data_table)))
 
 writeData(
@@ -1562,12 +1850,12 @@ writeData(
     "enhancer is listed. The goodness-of-fit (R²) is also indicated."
   ),
   startCol = 1,
-  startRow = 2
+  startRow = 4
 )
 
-addStyle(wb, sheet = 1, style = xlsx_wrap, rows = 2, cols = 1)
-mergeCells(wb, sheet = 1, rows = 2, cols = seq_len(ncol(data_table)))
-setRowHeights(wb, sheet = 1, rows = 2, heights = 12.5 * 4)
+addStyle(wb, sheet = 1, style = xlsx_wrap, rows = 4, cols = 1)
+mergeCells(wb, sheet = 1, rows = 4, cols = seq_len(ncol(data_table)))
+setRowHeights(wb, sheet = 1, rows = 4, heights = 12.5 * 4)
 
 xlsx_header <- names(data_table)
 enrichment_ids <- grep('ZT', xlsx_header, fixed = TRUE)
@@ -1578,38 +1866,38 @@ writeData(
   sheet = 1,
   matrix(xlsx_header, nrow = 1),
   startCol = 1,
-  startRow = 4,
+  startRow = 6,
   colNames = FALSE
 )
 
-addStyle(wb, sheet = 1, style = xlsx_boldwrap, cols = seq_along(xlsx_header), rows = 4)
+addStyle(wb, sheet = 1, style = xlsx_boldwrap, cols = seq_along(xlsx_header), rows = 6)
 
 writeData(
   wb,
   sheet = 1,
   data_table,
   startCol = 1,
-  startRow = 5,
+  startRow = 7,
   headerStyle = xlsx_bold,
   keepNA = TRUE
 )
 
-mergeCells(wb, sheet = 1, rows = 4, cols = enrichment_ids)
-addStyle(wb, sheet = 1, style = xlsx_center, rows = 4, cols = enrichment_ids, stack = TRUE)
+mergeCells(wb, sheet = 1, rows = 6, cols = enrichment_ids)
+addStyle(wb, sheet = 1, style = xlsx_center, rows = 6, cols = enrichment_ids, stack = TRUE)
 
 for (i in seq_along(xlsx_header)[-enrichment_ids]) {
-  mergeCells(wb, sheet = 1, rows = 4:5, cols = i)
+  mergeCells(wb, sheet = 1, rows = 6:7, cols = i)
 }
 
-addStyle(wb, sheet = 1, style = xlsx_2digit, cols = c(enrichment_ids, which(xlsx_header %in% c('Δ amplitude', 'R²'))), rows = 6:(nrow(data_table) + 6), gridExpand = TRUE)
-addStyle(wb, sheet = 1, style = xlsx_seq_font, cols = which(xlsx_header == 'sequence'), rows = 6:(nrow(data_table) + 6))
+addStyle(wb, sheet = 1, style = xlsx_2digit, cols = c(enrichment_ids, which(xlsx_header %in% c('Δ amplitude', 'R²'))), rows = 8:(nrow(data_table) + 8), gridExpand = TRUE)
+addStyle(wb, sheet = 1, style = xlsx_seq_font, cols = which(xlsx_header == 'sequence'), rows = 8:(nrow(data_table) + 8))
 
 setColWidths(wb, sheet = 1, cols = which(xlsx_header == 'unique'), widths = 19)
 setColWidths(wb, sheet = 1, cols = grep('peak', xlsx_header, fixed = TRUE), widths = 13.5)
 
-freezePane(wb, sheet = 1, firstActiveRow = 6)
+freezePane(wb, sheet = 1, firstActiveRow = 8)
 
-saveWorkbook(wb, paste0(supp_data_dir, 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
+saveWorkbook(wb, paste0(supp_data_dir, if_else(paper_id == '', '', paste0('tpc', paper_id, '-')), 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
 
 
 ## mean positional sensitivity to mutations
@@ -1782,6 +2070,21 @@ for (cond in unique(data_frags_AUCs$condition)) {
     file = paste0(export_dir, 'PEF_cor_AUC_', cond)
   )
   
+  # export correlation for each enhancer individually (for rebuttal letter)
+  data_export |>
+    group_by(enhancer) |>
+    summarise(
+      intercept = coef(lm(enrichment ~ AUC))[1],
+      slope = coef(lm(enrichment ~ AUC))[2],
+      rsquare = cor(enrichment, AUC)^2
+    ) |>
+    ungroup() |>
+    pivot_wider(
+      names_from = enhancer,
+      values_from = c(intercept, slope, rsquare)
+    ) |>
+    write_tsv(paste0(export_dir, 'PEF_cor_AUC_', cond, '_stats_per_enhancer.tsv'))
+  
   # export axis limits
   data_frags_AUCs |>
     summarise(
@@ -1939,12 +2242,20 @@ addWorksheet(wb, sheetName = 'enhancer fragment combinations')
 writeData(
   wb,
   sheet = 1,
-  paste0('Supplemental Data Set ', DS_id,'. Enhancer strength of combinations of fragments of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
+  paste('Supplemental Data. Jores et al.', paper_ref),
   startCol = 1,
   startRow = 1
 )
 
-addStyle(wb, sheet = 1, style = xlsx_bold, rows = 1, cols = 1)
+writeData(
+  wb,
+  sheet = 1,
+  paste0('Supplemental Data Set ', DS_id,' Enhancer strength of combinations of fragments of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
+  startCol = 1,
+  startRow = 3
+)
+
+makeNameBold(wb, DS_id)
 mergeCells(wb, sheet = 1, rows = 3, cols = seq_len(ncol(data_table)))
 
 writeData(
@@ -1961,12 +2272,12 @@ writeData(
     "two-fold more active in the dark."
   ),
   startCol = 1,
-  startRow = 2
+  startRow = 4
 )
 
-addStyle(wb, sheet = 1, style = xlsx_wrap, rows = 2, cols = 1)
-mergeCells(wb, sheet = 1, rows = 2, cols = seq_len(ncol(data_table)))
-setRowHeights(wb, sheet = 1, rows = 2, heights = 12.5 * 5)
+addStyle(wb, sheet = 1, style = xlsx_wrap, rows = 4, cols = 1)
+mergeCells(wb, sheet = 1, rows = 4, cols = seq_len(ncol(data_table)))
+setRowHeights(wb, sheet = 1, rows = 4, heights = 12.5 * 5)
 
 xlsx_header <- names(data_table)
 enrichment_ids <- which(xlsx_header %in% c('light', 'dark'))
@@ -1977,39 +2288,39 @@ writeData(
   sheet = 1,
   matrix(xlsx_header, nrow = 1),
   startCol = 1,
-  startRow = 4,
+  startRow = 6,
   colNames = FALSE
 )
 
-addStyle(wb, sheet = 1, style = xlsx_boldwrap, cols = seq_along(xlsx_header), rows = 4)
+addStyle(wb, sheet = 1, style = xlsx_boldwrap, cols = seq_along(xlsx_header), rows = 6)
 
 writeData(
   wb,
   sheet = 1,
   data_table,
   startCol = 1,
-  startRow = 5,
+  startRow = 7,
   headerStyle = xlsx_bold,
   keepNA = TRUE
 )
 
-mergeCells(wb, sheet = 1, rows = 4, cols = enrichment_ids)
-addStyle(wb, sheet = 1, style = xlsx_center, rows = 4, cols = enrichment_ids, stack = TRUE)
+mergeCells(wb, sheet = 1, rows = 6, cols = enrichment_ids)
+addStyle(wb, sheet = 1, style = xlsx_center, rows = 6, cols = enrichment_ids, stack = TRUE)
 
 for (i in seq_along(xlsx_header)[-enrichment_ids]) {
-  mergeCells(wb, sheet = 1, rows = 4:5, cols = i)
+  mergeCells(wb, sheet = 1, rows = 6:7, cols = i)
 }
 
-addStyle(wb, sheet = 1, style = xlsx_2digit, cols = enrichment_ids, rows = 6:(nrow(data_table) + 6), gridExpand = TRUE)
-addStyle(wb, sheet = 1, style = xlsx_seq_font, cols = which(xlsx_header == 'sequence'), rows = 6:(nrow(data_table) + 6))
+addStyle(wb, sheet = 1, style = xlsx_2digit, cols = enrichment_ids, rows = 8:(nrow(data_table) + 8), gridExpand = TRUE)
+addStyle(wb, sheet = 1, style = xlsx_seq_font, cols = which(xlsx_header == 'sequence'), rows = 8:(nrow(data_table) + 8))
 
 setColWidths(wb, sheet = 1, cols = which(xlsx_header == 'name'), widths = 36)
 setColWidths(wb, sheet = 1, cols = grep('fragment |category', xlsx_header), widths = 12)
 setColWidths(wb, sheet = 1, cols = which(xlsx_header == 'sequence'), widths = 53)
 
-freezePane(wb, sheet = 1, firstActiveRow = 6, firstActiveCol = 2)
+freezePane(wb, sheet = 1, firstActiveRow = 8, firstActiveCol = 2)
 
-saveWorkbook(wb, paste0(supp_data_dir, 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
+saveWorkbook(wb, paste0(supp_data_dir, if_else(paper_id == '', '', paste0('tpc', paper_id, '-')), 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
 
 
 ## predict enhancer strength from single fragments
@@ -2473,8 +2784,40 @@ data_del_doubles_pred <- data_mean_PEVdouble |>
 data_del_doubles_filtered <- data_del_doubles_pred |>
   filter(distance > 7)
 
+# annotate deletions within core TF binding sites (for rebuttal letter)
+dels_in_TF <- data_mean_PEVdouble |>
+  filter(type %in% c('deletion', 'WT')) |>
+  distinct(enhancer, mut1, pos1) |>
+  drop_na(mut1) |>
+  inner_join(
+    TF_hits_pos |>
+      filter(method == 'mutagenesis') |>
+      bind_rows( # add mutation-sensitive CCAAT and TGTGG sequences
+        tibble(
+          enhancer = c('AB80', 'Cab-1', 'rbcS-E9'),
+          start = c(204.5, 217.5, 170.5),
+          stop = c(209.5, 222.5, 175.5)
+        )
+      ),
+    by = join_by(enhancer, between(pos1, start, stop))
+  ) |>
+  distinct(enhancer, mut1) |>
+  unite(
+    'mut',
+    enhancer,
+    mut1
+  ) |>
+  pull()
+
+data_del_doubles_filtered_TF <- data_del_doubles_filtered |>
+  rowwise() |>
+  mutate(
+    in_TF = sum(paste(enhancer, mut1, sep = '_') %in% dels_in_TF, paste(enhancer, mut2, sep = '_') %in% dels_in_TF)
+  ) |>
+  ungroup()
+
 # export data
-enh_cond <- data_del_doubles_filtered |>
+enh_cond <- data_del_doubles_filtered_TF |>
   distinct(enhancer, condition) |>
   filter(condition == 'light' | enhancer == 'rbcS-E9')
 
@@ -2482,9 +2825,9 @@ for (i in seq_len(nrow(enh_cond))) {
   enh <- enh_cond[i, 'enhancer', drop = TRUE]
   cond <- enh_cond[i, 'condition', drop = TRUE]
 
-  data_export <- data_del_doubles_filtered |>
+  data_export <- data_del_doubles_filtered_TF |>
     filter(enhancer == enh & condition == cond) |>
-    select(enrichment, prediction, distance) |>
+    select(enrichment, prediction, distance, in_TF) |>
     slice_sample(prop = 1)
 
   write_tsv(data_export, paste0(export_dir, 'PEVdouble_prediction_', enh, '_', cond, '_points.tsv'))
@@ -2496,24 +2839,54 @@ for (i in seq_len(nrow(enh_cond))) {
   )
 }
 
+# export stats split by number of deletions in TFBSs
+enh_cond_TF <- data_del_doubles_filtered_TF |>
+  distinct(enhancer, condition, in_TF) |>
+  filter(condition == 'light' | enhancer == 'rbcS-E9')
+
+for (i in seq_len(nrow(enh_cond_TF))) {
+  enh <- enh_cond_TF[i, 'enhancer', drop = TRUE]
+  cond <- enh_cond_TF[i, 'condition', drop = TRUE]
+  TF <- enh_cond_TF[i, 'in_TF', drop = TRUE]
+  
+  data_export <- data_del_doubles_filtered_TF |>
+    filter(enhancer == enh & condition == cond & in_TF == TF)
+  
+  LaTeX_cor_stats(
+    x = data_export$prediction,
+    y = data_export$enrichment,
+    file = paste0(export_dir, 'PEVdouble_prediction_', enh, '_', cond, '_', TF)
+  )
+}
+
 # axis limits
-axis_limits <- data_del_doubles_filtered |>
+axis_limits <- data_del_doubles_filtered_TF |>
   inner_join(enh_cond) |>
   group_by(condition) |>
-  summarise(
+  mutate(
     xmin = min(enrichment, prediction),
     xmax = max(enrichment, prediction),
     ymin = xmin,
-    ymax = xmax,
-    `point meta min` = 1
+    ymax = xmax
+  ) |>
+  group_by(pick(enhancer, condition, ends_with(c('min', 'max')))) |>
+  summarise(
+    `point meta min` = min(distance),
+    `point meta max` = max(distance)
   ) |>
   ungroup()
 
-for (cond in unique(axis_limits$condition)) {
+enh_cond <- axis_limits |>
+  distinct(enhancer, condition)
+
+for (i in seq_len(nrow(enh_cond))) {
+  enh <- enh_cond[i, 'enhancer', drop = TRUE]
+  cond <- enh_cond[i, 'condition', drop = TRUE]
+  
   axis_limits |>
-    filter(condition == cond) |>
-    select(-condition) |>
-    write_tsv(paste0(export_dir, 'PEVdouble_prediction_', cond, '_axes.tsv'))
+    filter(enhancer == enh & condition == cond) |>
+    select(-enhancer, -condition) |>
+    write_tsv(paste0(export_dir, 'PEVdouble_prediction_', enh, '_', cond, '_axes.tsv'))
 }
 
 

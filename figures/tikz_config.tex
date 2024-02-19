@@ -83,7 +83,7 @@
 	\draw[dashed, thick] (c4) -- ++(.5, 0) coordinate (construct end);
 }
 
-\newcommand{\PSconstructStar}[3][0, 0]{
+\newcommand{\PSconstructStar}[3][Orchid1]{
 	\draw[dashed, thick] (#2) ++(.3, 0) -- ++(.5, 0) coordinate (c1) {};
 	
 	\draw[line width = .25cm, -Triangle Cap, #3!50]  (c1) ++(.1, 0) -- ++(.6, 0) coordinate (c2);
@@ -106,9 +106,22 @@
 }
 
 
+%% Plant STARR-seq constructs with enhancer fragment combinations
+% use:	\PEFconstruct(*)[<barcode color>]{<coordinate (no parentheses)>}{<fragment specification>}
+% the non-starred version generates constructs with random fragments (the <fragment specification> argument should be omitted);
+% the starred version generates constructs with the specified fragments
+% format for <fragment specification>: <enhancer 1>/<fragment 1>, <enhancer 2>/<fragment 2>, ...
+\makeatletter
+	\newcommand{\PEFconstruct}{%
+		\@ifstar
+			\PEFconstructStar%
+			\PEFconstructNoStar%
+	}
+\makeatother
+
 \pgfplotstableread{../data/sequence_files/enhancer-fragments.tsv}{\enhFragsTable}
 
-\newcommand{\PEFconstruct}[2][Orchid1]{
+\newcommand{\PEFconstructNoStar}[2][Orchid1]{
 	\draw[dashed, thick] (#2) -- ++(.5, 0) coordinate (c1) {};
 	
 	\draw[line width = .15cm, gray] (c1) ++(.1, 0) -- ++(.05, 0) coordinate (enh);
@@ -123,11 +136,51 @@
 		\edef\thislength{\pgfplotsretval}
 		\pgfplotstablegetelem{\pgfmathresult}{fragment}\of\enhFragsTable
 		\edef\thisfrag{\pgfplotsretval}
-		\draw[line width = .25cm, \thiscolor!50] (enh) -- ++(.015 * \thislength, 0) node[pos = .5, text = black, node font = \figsmall\bfseries\vphantom{abcdectrl}] {\thisfrag} coordinate (enh end);
+		\draw[line width = .25cm, \thiscolor!50] (enh) -- ++(.015 * \thislength, 0) node[pos = .5, text = black, node font = \figsmall\bfseries] {\vphantom{abcdectrl}\thisfrag} coordinate (enh end);
 		\draw[line width = .15cm, gray] (enh end) -- ++(.05, 0) coordinate (enh);
 	}
 	
-	\draw[line width = .2cm, 35S promoter] (enh) ++(.1, 0) -- ++(.4, 0) coordinate (c3);
+	\draw[line width = .2cm, 35S promoter] (enh) ++(.1, 0) coordinate (c2) -- ++(.4, 0) coordinate (c3);
+	\draw[-{Stealth[round]}, thick] (c3) ++(.5\pgflinewidth, 0) |- ++(.4,.3);
+	
+	\node[draw = black, thin, anchor = west] (ORF) at ($(c3) + (.4, 0)$) {~~GFP~};
+	
+	\node[draw = black, thin, anchor = west, text depth = 0pt] (polyA) at ($(ORF.east) + (.2, 0)$) {pA};
+	
+	\coordinate[xshift = .1cm] (c4) at (polyA.east);
+	
+	\begin{pgfonlayer} {background}
+		\fill[#1] (ORF.north west) ++(.15, 0) rectangle ($(ORF.south west) + (.05, 0)$);
+		\draw[thick] (c1) -- (ORF.west) (ORF.east) -- (polyA.west) (polyA.east) -- (c4);
+	\end{pgfonlayer}
+
+	\draw[dashed, thick] (c4) -- ++(.5, 0) coordinate (construct end);
+}
+
+\newcommand{\PEFconstructStar}[3][Orchid1]{
+	\draw[dashed, thick] (#2) -- ++(.5, 0) coordinate (c1) {};
+	
+	\draw[line width = .15cm, gray] (c1) ++(.1, 0) -- ++(.1, 0) coordinate (enh);
+	
+	\pgfmathint{random(3)}
+	
+	\foreach \thiscolor/\thisfrag in {#3}{
+		
+		\pgfplotstableforeachcolumnelement{enhancer}\of\enhFragsTable\as\thisenh{
+			\ifx\thiscolor\thisenh\relax
+				\pgfplotstablegetelem{\pgfplotstablerow}{fragment}\of\enhFragsTable
+				\ifx\thisfrag\pgfplotsretval\relax
+					\pgfplotstablegetelem{\pgfplotstablerow}{length}\of\enhFragsTable
+					\edef\thislength{\pgfplotsretval}
+				\fi
+			\fi
+		}
+		
+		\draw[line width = .25cm, \thiscolor!50] (enh) -- ++(.015 * \thislength, 0) node[pos = .5, text = black, node font = \figsmall\bfseries] {\vphantom{abcdectrl}\thisfrag} coordinate (enh end);
+		\draw[line width = .15cm, gray] (enh end) -- ++(.1, 0) coordinate (enh);
+	}
+	
+	\draw[line width = .2cm, 35S promoter] (enh) ++(.1, 0) coordinate (c2) -- ++(.4, 0) coordinate (c3);
 	\draw[-{Stealth[round]}, thick] (c3) ++(.5\pgflinewidth, 0) |- ++(.4,.3);
 	
 	\node[draw = black, thin, anchor = west] (ORF) at ($(c3) + (.4, 0)$) {~~GFP~};

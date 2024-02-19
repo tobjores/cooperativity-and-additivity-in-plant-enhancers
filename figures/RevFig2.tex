@@ -1,0 +1,107 @@
+\begin{tikzpicture}
+
+	%%% PEF: single fragments vs. DMS AUCs
+	\coordinate (AUC) at (0, 0);
+
+	\begin{hgroupplot}[%
+		group position = {anchor = above north west, at = {(AUC)}, xshift = \plotylabelwidth},
+		enlargelimits = .15,
+		ytick = {-10, -8, ..., 10},
+		zero line,
+		legend style = {anchor = north east, at = {(1, .525)}},
+		legend plot pos = right,
+		legend cell align = right,
+		scatter/classes = {
+			AB80={AB80},
+			Cab-1={Cab-1},
+			rbcS-E9={rbcS-E9}
+		},
+		ylabel = {$\log_2$(enhancer strength)}
+	]{\twocolumnwidth}{2}{$-$AUC}
+	
+		\nextgroupplot[
+			title = \light,
+			title color = light,
+			axis limits from table = {rawData/PEF_cor_AUC_light_axes.tsv},
+		]
+		
+			% regression lines
+			\pgfplotstableread{rawData/PEF_cor_AUC_light_stats_per_enhancer.tsv}{\statstable}
+			\coordinate (c1) at (rel axis cs: 0, 1);
+			
+			\pgfplotsinvokeforeach{AB80, Cab-1, rbcS-E9}{
+				% regression line
+				\pgfplotstablegetelem{0}{intercept_#1}\of\statstable
+				\edef\intercept{\pgfplotsretval}
+				\pgfplotstablegetelem{0}{slope_#1}\of\statstable
+				\edef\slope{\pgfplotsretval}
+				\edef\thisline{\noexpand\draw[#1, thick] (\noexpand\xmin, \noexpand\xmin * \slope + \intercept) -- (\noexpand\xmax, \noexpand\xmax * \slope + \intercept);}
+				\thisline
+				
+				% correlation
+				\pgfplotstablegetelem{0}{rsquare_#1}\of\statstable
+				\edef\thisstat{
+					\noexpand\node[anchor = north west, text = #1, inner ysep = .2em, font = \noexpand\bfseries] (stats) at (c1) {\noexpand\textit{R}\noexpand\textsuperscript{2} = \noexpand\pgfmathprintnumber[fixed, fixed zerofill, precision = 2, assume math mode = true]{\pgfplotsretval}};
+					\noexpand\coordinate[yshift = -.9\noexpand\baselineskip] (c1) at (c1);
+				}
+				\thisstat
+			}
+			
+			
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				mark size = 1.25
+			] table[x = AUC, y = enrichment, meta = enhancer] {rawData/PEF_cor_AUC_light_points.tsv};
+			
+			
+		\nextgroupplot[
+			title = \dark,
+			title color = dark,
+			axis limits from table = {rawData/PEF_cor_AUC_dark_axes.tsv},
+		]
+		
+			% regression lines
+			\pgfplotstableread{rawData/PEF_cor_AUC_dark_stats_per_enhancer.tsv}{\statstable}
+			\coordinate (c1) at (rel axis cs: 0, 1);
+			
+			\pgfplotsinvokeforeach{AB80, Cab-1, rbcS-E9}{
+				% regression line
+				\pgfplotstablegetelem{0}{intercept_#1}\of\statstable
+				\edef\intercept{\pgfplotsretval}
+				\pgfplotstablegetelem{0}{slope_#1}\of\statstable
+				\edef\slope{\pgfplotsretval}
+				\edef\thisline{\noexpand\draw[#1, thick] (\noexpand\xmin, \noexpand\xmin * \slope + \intercept) -- (\noexpand\xmax, \noexpand\xmax * \slope + \intercept);}
+				\thisline
+				
+				% correlation
+				\pgfplotstablegetelem{0}{rsquare_#1}\of\statstable
+				\edef\thisstat{
+					\noexpand\node[anchor = north west, text = #1, inner ysep = .2em, font = \noexpand\bfseries] (stats) at (c1) {\noexpand\textit{R}\noexpand\textsuperscript{2} = \noexpand\pgfmathprintnumber[fixed, fixed zerofill, precision = 2, assume math mode = true]{\pgfplotsretval}};
+					\noexpand\coordinate[yshift = -.9\noexpand\baselineskip] (c1) at (c1);
+				}
+				\thisstat
+			}
+			
+			% scatter plot
+			\addplot [
+				scatter,
+				scatter src = explicit symbolic,
+				only marks,
+				mark = solido,
+				mark size = 1.25
+			] table[x = AUC, y = enrichment, meta = enhancer] {rawData/PEF_cor_AUC_dark_points.tsv};
+			
+			% legend
+			\legend{\enhancer{AB80}, \enhancer{Cab-1}, \enhancer{rbcS-E9}}
+			
+	\end{hgroupplot}
+	
+	
+	%%% subfigure labels
+	\subfiglabel{AUC}
+	
+\end{tikzpicture}

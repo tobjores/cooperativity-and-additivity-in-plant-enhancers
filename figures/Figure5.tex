@@ -1,26 +1,52 @@
 \begin{tikzpicture}
 	\addtolength{\plotylabelwidth}{\baselineskip}
 	
-	\pgfplotsset{
-		colorbar distance/.style = {
-			colorbar horizontal,
-			colorbar style = {
-				anchor = south west,
-				at = {(.025, .025)},
-				height = .25cm,
-				width = .4 * \pgfkeysvalueof{/pgfplots/parent axis height},
-				tick pos = upper,
-				xticklabel pos = right,
-				xticklabel style = {node font = \figtiny, inner ysep = .1em, text depth = 0pt},
-				title = distance (bp)\\\vphantom{1},
-				title style = {fill = none, draw = none, minimum width = 0, node font = \figsmall, align = center, anchor = south},
-				extra x ticks = {8},
-			},
-		}
-	}
+	%%% constructs
+	\coordinate (constructs) at (0, 0);
+	
+	\coordinate[shift = {(.1, -.6)}] (del 1) at (constructs);
+	
+	\PSconstruct{del 1}{AB80!50}
+	\draw[line width = .25cm, black] ($(c1)!.3!(c2)$) -- ++(.05, 0);
+	\node[anchor = south, font = \bfseries, shift = {(-.45, .1)}] at (c2) {\textDelta 1};
+	
+	\coordinate[xshift = \columnsep] (del 2) at (construct end);
+	
+	\PSconstruct[MediumPurple1]{del 2}{AB80!50}
+	\draw[line width = .25cm, black] ($(c1)!.5!(c2)$) -- ++(.05, 0);
+	\node[anchor = south, font = \bfseries, shift = {(-.45, .1)}] at (c2) {\textDelta 2};
+	
+	\coordinate[xshift = \columnsep] (del 3) at (construct end);
+	
+	\PSconstruct[HotPink1]{del 3}{AB80!50}
+	\draw[line width = .25cm, black] ($(c1)!.7!(c2)$) -- ++(.05, 0);
+	\node[anchor = south, font = \bfseries, shift = {(-.45, .1)}] at (c2) {\textDelta 3};
+	
+	\node[anchor = west, font = \bfseries, align = center, xshift = \columnsep] at (construct end) {\textDelta4, \textDelta5,\\\textDelta6, \textDelta7,\\[-.5\baselineskip]\dots};
+	
+	\coordinate[yshift = -1cm] (double 12) at (del 1);
+	
+	\PSconstruct[MediumOrchid3]{double 12}{AB80!50}
+	\draw[line width = .25cm, black] ($(c1)!.3!(c2)$) -- ++(.05, 0) ($(c1)!.5!(c2)$) -- ++(.05, 0);
+	\node[anchor = south, font = \bfseries, shift = {(-.45, .1)}] at (c2) {\textDelta 1+\textDelta 2};
+	
+	\coordinate[yshift = -1cm] (double 13) at (del 2);
+	
+	\PSconstruct[Plum1]{double 13}{AB80!50}
+	\draw[line width = .25cm, black] ($(c1)!.3!(c2)$) -- ++(.05, 0) ($(c1)!.7!(c2)$) -- ++(.05, 0);
+	\node[anchor = south, font = \bfseries, shift = {(-.45, .1)}] at (c2) {\textDelta 1+\textDelta 3};
+	
+	\coordinate[yshift = -1cm] (double 23) at (del 3);
+	
+	\PSconstruct[SlateBlue3]{double 23}{AB80!50}
+	\draw[line width = .25cm, black] ($(c1)!.5!(c2)$) -- ++(.05, 0) ($(c1)!.7!(c2)$) -- ++(.05, 0);
+	\node[anchor = south, font = \bfseries, shift = {(-.45, .1)}] at (c2) {\textDelta 2+\textDelta 3};
+	
+	\node[anchor = west, font = \bfseries, align = center, xshift = \columnsep] at (construct end) {\textDelta1+\textDelta4,\\\textDelta2+\textDelta4,\\[-.5\baselineskip]\dots};
+	
 	
 	%%% effect of two deletions in light
-	\coordinate[yshift = -\columnsep] (prediction light) at (0, 0);
+	\coordinate[yshift = -\columnsep] (prediction light) at (constructs |- ORF.south);
 	
 	\node[anchor = north west, text depth = 0pt, font = \hphantom{A}] (ptitle) at (prediction light) {\vphantom{\light}};
 	
@@ -30,19 +56,18 @@
 	
 	\begin{hgroupplot}[%
 		group position = {anchor = above north west, at = {(prediction light)}, xshift = \plotylabelwidth},
-		axis limits from table = {rawData/PEVdouble_prediction_light_axes.tsv},
 		enlargelimits = .05,
 		ylabel = \textbf{measurement}:\\$\log_2$(enhancer strength),
 		zero line,
 		show diagonal,
 		colormap name = viridis,
 		colorbar distance,
-		point meta min = 8
 	]{3\templength + \plotylabelwidth + 2\groupplotsep}{3}{\textbf{additive model}: $\log_2$(enhancer strength)}
 		
 		\nextgroupplot[
-			title = \enhancer{AB80},
-			title color = AB80
+			title = \enhancer{AB80} enhancer\\\segment{B} segment,
+			title color = AB80,
+			axis limits from table = {rawData/PEVdouble_prediction_AB80_light_axes.tsv}
 		]
 		
 			% scatter plot
@@ -59,8 +84,9 @@
 			
 			
 		\nextgroupplot[
-			title = \enhancer{Cab-1},
-			title color = Cab-1
+			title = \enhancer{Cab-1} enhancer\\\segment{B} segment,
+			title color = Cab-1,
+			axis limits from table = {rawData/PEVdouble_prediction_Cab-1_light_axes.tsv}
 		]
 		
 			% scatter plot
@@ -77,8 +103,9 @@
 			
 			
 		\nextgroupplot[
-			title = \enhancer{rbcS-E9},
-			title color = rbcS-E9
+			title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
+			title color = rbcS-E9,
+			axis limits from table = {rawData/PEVdouble_prediction_rbcS-E9_light_axes.tsv}
 		]
 		
 			% scatter plot
@@ -109,18 +136,17 @@
 		at = {(prediction dark)},
 		xshift = \plotylabelwidth,
 		width = \templength,
-		axis limits from table = {rawData/PEVdouble_prediction_dark_axes.tsv},
+		axis limits from table = {rawData/PEVdouble_prediction_rbcS-E9_dark_axes.tsv},
 		enlargelimits = .05,
 		ylabel = \textbf{measurement}:\\$\log_2$(enhancer strength),
 		zero line,
 		show diagonal,
-		title = \enhancer{rbcS-E9},
+		title = \enhancer{rbcS-E9} enhancer\\\segment{B} segment,
 		title color = rbcS-E9,
 		title style = {minimum width = \templength},
 		xlabel = \textbf{additive model}:\\$\log_2$(enhancer strength),
 		colormap name = viridis,
 		colorbar distance,
-		point meta min = 8
 	]
 		
 			% scatter plot
@@ -143,6 +169,7 @@
 	
 	
 	%%% subfigure labels
+	\subfiglabel{constructs}
 	\subfiglabel{prediction light}
 	\subfiglabel{prediction dark}
 	
