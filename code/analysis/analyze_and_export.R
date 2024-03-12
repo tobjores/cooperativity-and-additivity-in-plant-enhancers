@@ -15,9 +15,6 @@ source('code/analysis/export_functions.R')
 export_dir <- 'figures/rawData/'
 supp_data_dir <- 'data/supplemental_data/'
 
-paper_ref <- '' # update once we have a DOI (e.g. "Plant Cell (2015). 10.1105/tpc.18.00001.")
-paper_id <- str_split_1(paper_ref, fixed('.')) |> tail(2) |> head(1)
-
 
 ### load data ###
 sapply(dir(path = 'data/RData/', pattern = '*.Rdata', full.names = TRUE), load, environment())
@@ -620,7 +617,7 @@ addWorksheet(wb, sheetName = 'single-nucleotide variants (ld)')
 writeData(
   wb,
   sheet = 1,
-  paste('Supplemental Data. Jores et al.', paper_ref),
+  'Supplemental Data. Jores et al. (2024). Enhancer cooperativity and additivity. Plant Cell.',
   startCol = 1,
   startRow = 1
 )
@@ -628,7 +625,7 @@ writeData(
 writeData(
   wb,
   sheet = 1,
-  paste0('Supplemental Data Set ', DS_id,' Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
+  paste0('Supplemental Data Set S', DS_id,' Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
   startCol = 1,
   startRow = 3
 )
@@ -641,7 +638,7 @@ writeData(
   sheet = 1,
   paste(
     "All possible single-nucleotide substitution, deletion, and insertion variants of the 5' and 3' segments of the AB80, Cab-1, and rbcS-E9",
-    "enhancers were subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (light) or completely in the dark (dark)",
+    "enhancers were subjected to Plant STARR-seq in N. benthamiana plants grown in normal light/dark cycles (light) or completely in the dark (dark)",
     "for two days prior to RNA extraction. The enhancer strength of the individual insertion, substitution, and deletion variants was measured",
     "and normalized to the wild-type variant (log2 set to 0)."
   ),
@@ -692,7 +689,7 @@ setColWidths(wb, sheet = 1, cols = which(xlsx_header == 'unique'), widths = 19)
 
 freezePane(wb, sheet = 1, firstActiveRow = 8)
 
-saveWorkbook(wb, paste0(supp_data_dir, if_else(paper_id == '', '', paste0('tpc', paper_id, '-')), 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
+saveWorkbook(wb, paste0(supp_data_dir, 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
 
 
 ## scan enhancer sequences for transcription factor binding sites
@@ -704,7 +701,7 @@ FL_sequences <- enhancer_sequences |>
 
 TF_scan <- scan_sequences(TF_motifs, FL_sequences, RC = TRUE) |>
   as_tibble() |>
-  select(sequence, 'id' = motif.i, start, stop, strand) |>
+  select(sequence, 'id' = motif.i, start, stop, strand, score, pvalue) |>
   mutate(
     id = paste0('TF-', id),
     orientation = if_else(strand == '+', 'fwd', 'rev'),
@@ -745,7 +742,7 @@ enhancer_fragments |>
 for (enhancer in unique(TF_scan$sequence)) {
   TF_scan |>
     filter(sequence == enhancer) |>
-    select(-sequence) |>
+    select(-sequence, -score, -pvalue) |>
     write_tsv(paste0(export_dir, 'PEV_ld_TF-scan_', enhancer, '.tsv'))
 }
 
@@ -789,6 +786,30 @@ TF_scan |>
   ) |>
   rename('ID' = id) |>
   write_tsv(paste0(export_dir, 'PEV_ld_TF-scan_legend.tsv'))
+
+# export p-values
+TF_scan |>
+  mutate(
+    start = start + 0.5,
+    stop = stop - 0.5
+  ) |>
+  arrange(enhancer, start) |>
+  reframe(
+    figure = paste0(
+      'S7',
+      case_match(
+        enhancer,
+        'AB80' ~ 'A',
+        'Cab-1' ~ 'B',
+        'rbcS-E9' ~ 'C'
+      )
+    ),
+    analysis = 'motif scan using scan_sequences() function of universalmotif package in R',
+    comparison = paste0(id, ' vs. ', enhancer, ' (', start, '-', stop, ')'),
+    statistic = paste0('score = ', round(score, 3)),
+    p_value = pvalue
+  ) |>
+  write_tsv(paste0(export_dir, 'PEV_ld_TF-scan_p-values.tsv'))
 
 
 ## generate sequence logos for mutation-sensitive regions
@@ -947,6 +968,35 @@ TF_hits_PWMs <- TF_hits_filtered |>
     LaTeX_PWM = list(PWM_to_LaTeX(motif, paste0(export_dir, 'seqLogo_TF-', target.i, '_', orientation, '.tsv')))
   )
 
+# export p-values
+TF_hits_filtered |>
+  inner_join(
+    enhancer_fragments |>
+      select(enhancer, 'region' = fragment, start),
+    by = c('enhancer', 'region')
+  ) |>
+  mutate(
+    start = start + offset,
+    stop = start + length - 1
+  ) |>
+  arrange(enhancer, desc(condition), region, start) |>
+  reframe(
+    figure = paste0(
+      '3',
+      case_when(
+        condition == 'dark' ~ 'E',
+        enhancer == 'AB80' ~ 'B',
+        enhancer == 'Cab-1' ~ 'C',
+        enhancer == 'rbcS-E9' ~ 'D'
+      )
+    ),
+    analysis = 'motif comparison using compare_motifs() function of universalmotif package in R',
+    comparison = paste0(TFfamily, ' vs. ', enhancer, ' region ', region, ' (', start, '-', stop, ')'),
+    statistic = paste0('score = ', round(score, 3)),
+    p_value = Pval
+  ) |>
+  write_tsv(paste0(export_dir, 'PEV_ld_TF-matches_p-values.tsv'))
+  
 
 ## correlation between variant enhancer strength and TF motif match
 # combine TF hits from the scanning and mutagenesis data approach
@@ -1821,7 +1871,7 @@ addWorksheet(wb, sheetName = 'single-nucleotide variants (cr)')
 writeData(
   wb,
   sheet = 1,
-  paste('Supplemental Data. Jores et al.', paper_ref),
+  'Supplemental Data. Jores et al. (2024). Enhancer cooperativity and additivity. Plant Cell.',
   startCol = 1,
   startRow = 1
 )
@@ -1829,7 +1879,7 @@ writeData(
 writeData(
   wb,
   sheet = 1,
-  paste0('Supplemental Data Set ', DS_id,' Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in time course experiment.'),
+  paste0('Supplemental Data Set S', DS_id,' Enhancer strength of single-nucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers in time course experiment.'),
   startCol = 1,
   startRow = 3
 )
@@ -1841,7 +1891,7 @@ writeData(
   wb,
   sheet = 1,
   paste(
-    "All possible singlenucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers were subjected to Plant STARR-seq in tobacco leaves.",
+    "All possible singlenucleotide variants of the AB80, Cab-1, and rbcS-E9 enhancers were subjected to Plant STARR-seq in N. benthamiana leaves.",
     "On the morning of the third day after transformation (ZT 0), the plants were shifted to constant light. Leaves were harvested for RNA",
     "extraction starting at mid-day (ZT 8) and in 6 hour intervals (ZT 14, 20, 26, and 32) afterwards. The enhancer strength of the individual",
     "insertion, substitution, and deletion variants was measured and normalized to the wild-type variant (log2 set to 0). For the 3' enhancer",
@@ -1897,7 +1947,7 @@ setColWidths(wb, sheet = 1, cols = grep('peak', xlsx_header, fixed = TRUE), widt
 
 freezePane(wb, sheet = 1, firstActiveRow = 8)
 
-saveWorkbook(wb, paste0(supp_data_dir, if_else(paper_id == '', '', paste0('tpc', paper_id, '-')), 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
+saveWorkbook(wb, paste0(supp_data_dir, 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
 
 
 ## mean positional sensitivity to mutations
@@ -2242,7 +2292,7 @@ addWorksheet(wb, sheetName = 'enhancer fragment combinations')
 writeData(
   wb,
   sheet = 1,
-  paste('Supplemental Data. Jores et al.', paper_ref),
+  'Supplemental Data. Jores et al. (2024). Enhancer cooperativity and additivity. Plant Cell.',
   startCol = 1,
   startRow = 1
 )
@@ -2250,7 +2300,7 @@ writeData(
 writeData(
   wb,
   sheet = 1,
-  paste0('Supplemental Data Set ', DS_id,' Enhancer strength of combinations of fragments of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
+  paste0('Supplemental Data Set S', DS_id,' Enhancer strength of combinations of fragments of the AB80, Cab-1, and rbcS-E9 enhancers in the light or dark.'),
   startCol = 1,
   startRow = 3
 )
@@ -2265,7 +2315,7 @@ writeData(
     "Fragments of the AB80, Cab-1, and rbcS-E9 enhancers spanning 1–3 mutation-sensitive regions (a–e, ab, abc, bc, de; see Figure 6A) as",
     "well as a control fragment from a mutation-insensitive region in Cab-1 (ctrl) and a shuffled version of the AB80 fragment d (d_rand)",
     "were ordered as oligonucleotides. These fragments were randomly combined (separated by a 6-bp spacer: gtgatg) to create synthetic enhancer",
-    "with up to three fragments which were then subjected to Plant STARR-seq in tobacco plants grown in normal light/dark cycles (light) or",
+    "with up to three fragments which were then subjected to Plant STARR-seq in N. benthamiana plants grown in normal light/dark cycles (light) or",
     "completely in the dark (dark) for two days prior to RNA extraction. Enhancer strength was normalized to a control construct without an",
     "enhancer (log2 set to 0). The synthetic enhancers were grouped into four categories: inactive, log2(enhancer strength) ≤ 1 in both conditions;",
     "constitutive, similar strength in both conditions; light-activated, at least two-fold more active in the light; dark-activated, at least",
@@ -2320,7 +2370,7 @@ setColWidths(wb, sheet = 1, cols = which(xlsx_header == 'sequence'), widths = 53
 
 freezePane(wb, sheet = 1, firstActiveRow = 8, firstActiveCol = 2)
 
-saveWorkbook(wb, paste0(supp_data_dir, if_else(paper_id == '', '', paste0('tpc', paper_id, '-')), 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
+saveWorkbook(wb, paste0(supp_data_dir, 'SupplementalDS', DS_id, '.xlsx'), overwrite = TRUE)
 
 
 ## predict enhancer strength from single fragments
@@ -2584,6 +2634,17 @@ LaTeX_violinplot(
   values_from = diff,
   file = paste0(export_dir, 'PEF_order_diff')
 )
+
+# export p-value
+data_export |>
+  summarise(
+    figure = '6H',
+    analysis = 'two-sided two-sample Wilcoxon rank sum test with continuity correction',
+    comparison = 'light vs. dark',
+    statistic = paste0('W = ', wilcox.test(diff[condition == 'light'], diff[condition == 'dark'])$statistic),
+    p_value = wilcox.test(diff[condition == 'light'], diff[condition == 'dark'])$p.value
+  ) |>
+  write_tsv(paste0(export_dir, 'PEF_order_p-values.tsv'))
 
 
 ### PEval library (pooled PEFval and PEVdouble libraries) ###
